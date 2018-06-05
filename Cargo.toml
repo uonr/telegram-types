@@ -1,5 +1,5 @@
 [package]
-name = "telegram-types"
+name = "telegram_types"
 version = "0.1.0"
 authors = ["Quan Brew <t@ioover.net>"]
 
