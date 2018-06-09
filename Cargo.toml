@@ -6,7 +6,9 @@ repository = "https://github.com/quanbrew/telegram-types"
 categories = ["api-bindings"]
 license = "MIT"
 description = "Types in the Telegram Bot API and their deserializers"
-
+readme = "README.md"
+[badges]
+travis-ci = { repository = "quanbrew/telegram-types", branch = "master" }
 [dependencies]
 serde = "1.0"
 serde_derive = "1.0"
