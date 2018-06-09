@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "result": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "hello, world",
+          "url": "http://example.com/",
+          "switch_inline_query": "example_bot"
+        }
+      ]
+    ]
+  }
+}

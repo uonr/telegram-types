@@ -1,4 +1,4 @@
 # Telegram Types
 Types in the Telegram Bot API and their deserializers
 
-See [Telegram Bot API documents](https://core.telegram.org/bots/api#available-types).
+See also [Telegram Bot API](https://core.telegram.org/bots/api).
