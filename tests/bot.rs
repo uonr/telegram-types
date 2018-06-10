@@ -32,7 +32,9 @@ fn empty_reply_keyboard_markup() {
 
 #[test]
 fn fake_inline_keyboard_markup() {
-    from_result::<types::InlineKeyboardMarkup>(&include_str!("json/fake_inline_keyboard_markup.json")).unwrap();
+    let raw = &include_str!("json/fake_inline_keyboard_markup.json");
+    let markup = from_result::<types::InlineKeyboardMarkup>(raw).unwrap();
+    println!("{:?}", markup)
 }
 
 
