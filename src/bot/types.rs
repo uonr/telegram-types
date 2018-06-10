@@ -22,18 +22,18 @@ pub struct Update {
     /// since it allows you to ignore repeated updates or to restore the correct update sequence,
     /// should they get out of order. If there are no new updates for at least a week,
     /// then identifier of the next update will be chosen randomly instead of sequentially.
-    update_id: i32,
+    pub update_id: i32,
     /// New incoming message of any kind — text, photo, sticker, etc.
-    message: Option<Box<Message>>,
+    pub message: Option<Box<Message>>,
     /// New version of a message that is known to the bot and was edited
-    edited_message: Option<Box<Message>>,
+    pub edited_message: Option<Box<Message>>,
     /// New incoming channel post of any kind — text, photo, sticker, etc.
-    channel_post: Option<Box<Message>>,
+    pub channel_post: Option<Box<Message>>,
     /// New version of a channel post that is known to the bot and was edited
-    edited_channel_post: Option<Box<Message>>,
+    pub edited_channel_post: Option<Box<Message>>,
     // TODO: inline_query, chosen_inline_result, shipping_query, pre_checkout_query
     /// New incoming callback query
-    callback_query: Option<CallbackQuery>,
+    pub callback_query: Option<CallbackQuery>,
 }
 
 /// Contains information about the current status of a webhook.
@@ -133,6 +133,7 @@ pub struct Chat {
     /// Chat photo. Returned only in `getChat`.
     pub photo: Option<ChatPhoto>,
     /// Type of chat
+    #[serde(flatten)]
     pub kind: ChatType,
 }
 
@@ -147,7 +148,7 @@ pub struct Message {
     /// Date the message was sent in Unix time
     pub date: Date,
     /// Conversation the message belongs to
-    pub chat: Chat,
+    pub chat: Box<Chat>,
     /// For forwarded messages, sender of the original message
     pub forward_from: Option<Box<User>>,
     /// For messages forwarded from channels, information about the original channel
@@ -173,7 +174,7 @@ pub struct Message {
     /// Message is a sticker, information about the sticker
     pub sticker: Option<Box<Sticker>>,
     /// Message is an audio file, information about the file
-    audio: Option<Audio>,
+    pub audio: Option<Audio>,
     /// Message is a general file, information about the file
     pub document: Option<Box<Document>>,
     #[serde(default)]
@@ -303,9 +304,9 @@ pub struct Audio {
     /// Duration of the audio in seconds as defined by sender
     pub duration: i32,
     /// Performer of the audio as defined by sender or by audio tags
-    performer: Option<String>,
+    pub performer: Option<String>,
     /// Title of the audio as defined by sender or by audio tags
-    title: Option<String>,
+    pub title: Option<String>,
     /// MIME type of the file as defined by sender
     pub mime_type: Option<String>,
     pub file_size: Option<i32>,
