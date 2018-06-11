@@ -24,7 +24,7 @@ pub struct GetUpdates {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash)]
-pub struct UpdateList (Vec<types::Update>);
+pub struct UpdateList (pub Vec<types::Update>);
 
 /// Use this method to specify a url and receive incoming updates via an outgoing webhook.
 /// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified

@@ -7,7 +7,7 @@ fn falsum() -> bool { false }
 
 /// Unique identifier for this chat.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct ChatId(i64);
+pub struct ChatId(pub i64);
 
 
 /// An incoming update.
