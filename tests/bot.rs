@@ -3,7 +3,7 @@ extern crate serde_json;
 extern crate telegram_types;
 
 use serde_json::Value;
-use telegram_types::bot::types;
+use telegram_types::bot::{types, methods};
 
 pub fn from_result<T>(raw: &str) -> serde_json::Result<T>
     where T: for<'de> serde::Deserialize<'de> {
@@ -42,4 +42,22 @@ fn fake_inline_keyboard_markup() {
 fn fake_illegal_inline_keyboard_markup() {
     let raw = include_str!("json/fake_illegal_inline_keyboard_markup.json");
     let _markup = from_result::<types::InlineKeyboardMarkup>(&raw).unwrap();
+}
+
+#[test]
+fn chat() {
+    let raw = include_str!("json/chat.json");
+    let _chat = serde_json::from_str::<types::Chat>(raw).unwrap();
+}
+
+#[test]
+fn message() {
+    let raw = include_str!("json/message.json");
+    let _chat = serde_json::from_str::<types::Message>(raw).unwrap();
+}
+
+#[test]
+fn update() {
+    let raw = include_str!("json/update.json");
+    let _update = from_result::<methods::UpdateList>(&raw).unwrap();
 }

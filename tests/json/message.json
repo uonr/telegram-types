@@ -1,0 +1,23 @@
+{
+    "message_id":1,
+    "from":{
+        "id":42234,
+        "is_bot":false,
+        "first_name":"Homura",
+        "last_name":"Akemi",
+        "username":"homura",
+        "language_code":"zh-Hant-HK"
+    },
+    "chat":{
+        "id":88569449,
+        "first_name":"Homura",
+        "last_name":"Akemi",
+        "username":"homura",
+        "type":"private"
+    },
+    "date":1528706565,
+    "text":"/start",
+    "entities":[
+        {"offset":0,"length":6,"type":"bot_command"}
+    ]
+}

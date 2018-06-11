@@ -134,6 +134,7 @@ pub struct Chat {
     pub photo: Option<ChatPhoto>,
     /// Type of chat
     #[serde(flatten)]
+    #[serde(rename = "type")]
     pub kind: ChatType,
 }
 
@@ -246,13 +247,14 @@ pub struct Message {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct MessageEntity {
     /// Type of the entity.
+    #[serde(rename="type")]
     pub kind: MessageEntityKind,
     /// Offset in UTF-16 code units to the start of the entity
     pub offset: i32,
     /// Length of the entity in UTF-16 code units
     pub length: i32,
     /// For “text_link” only, url that will be opened after user taps on the text
-    pub url: String,
+    pub url: Option<String>,
     /// For “text_mention” only, the mentioned user
     pub user: Option<Box<User>>,
 }
