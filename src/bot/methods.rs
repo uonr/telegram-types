@@ -12,20 +12,27 @@ pub enum ChatTarget {
     Username(String),
 }
 
+/// Use this method to receive incoming updates using long
+/// polling ([wiki](https://en.wikipedia.org/wiki/Push_technology#Long_polling)).
+/// An Array of [`Update`] objects is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GetUpdates {
-    offset: Option<i32>,
-    limit: Option<i32>,
-    timeout: Option<i32>,
-    allowed_updates: Option<Vec<String>>,
+    pub offset: Option<i32>,
+    pub limit: Option<i32>,
+    pub timeout: Option<i32>,
+    pub allowed_updates: Option<Vec<String>>,
 }
 
+/// Use this method to specify a url and receive incoming updates via an outgoing webhook.
+/// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified
+/// url, containing a JSON-serialized [`Update`]. In case of an unsuccessful request, we will give up
+/// after a reasonable amount of attempts. Returns True on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SetWebhook {
-    url: String,
+    pub url: String,
     // certificate
-    max_connections: Option<i32>,
-    allowed_updates: Option<Vec<String>>,
+    pub ax_connections: Option<i32>,
+    pub allowed_updates: Option<Vec<String>>,
 }
 
 
@@ -42,83 +49,117 @@ pub enum ReplyMarkup {
 /// Send text messages. On success, the sent [`Message`](types::Message) is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SendMessage {
-    chat_id: ChatTarget,
-    text: String,
-    parse_mode: Option<ParseMode>,
-    disable_web_page_preview: Option<bool>,
-    disable_notification: Option<bool>,
-    reply_to_message_id: Option<i32>,
-    reply_markup: Option<ReplyMarkup>,
+    pub chat_id: ChatTarget,
+    pub text: String,
+    pub parse_mode: Option<ParseMode>,
+    pub disable_web_page_preview: Option<bool>,
+    pub disable_notification: Option<bool>,
+    pub reply_to_message_id: Option<i32>,
+    pub reply_markup: Option<ReplyMarkup>,
 }
 
+
+/// Use this method to forward messages of any kind. On success, the sent `Message` is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ForwardMessage {
-    chat_id: ChatTarget,
-    from_chat_id: ChatTarget,
-    message_id: i32,
+    pub chat_id: ChatTarget,
+    pub from_chat_id: ChatTarget,
+    pub message_id: i32,
 }
 
 /// To get a list of profile pictures for a user. Returns a [`UserProfilePhotos`](types::UserProfilePhotos) object.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GetUserProfilePhotos {
-    user_id: i32,
-    offset: Option<i32>,
-    limit: Option<i32>,
+    pub user_id: i32,
+    pub offset: Option<i32>,
+    pub limit: Option<i32>,
 }
 
 
+/// Use this method to get up to date information about the chat (current name of the user
+/// for one-on-one conversations, current username of a user, group or channel, etc.).
+///
+/// Returns a [`Chat`] object on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GetChat {
     pub chat_id: ChatTarget,
 }
 
+/// Use this method to get the number of members in a chat. Returns `Int` on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GetChatMembersCount {
     pub chat_id: ChatTarget,
 }
 
+/// Use this method to get a list of administrators in a chat. On success, returns an Array
+/// of `ChatMember` objects that contains information about all chat administrators except
+/// other bots. If the chat is a group or a supergroup and no administrators were appointed,
+/// only the creator will be returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GetChatAdministrators {
     pub chat_id: ChatTarget,
 }
 
+/// Use this method to get information about a member of a chat. Returns a `ChatMember`
+/// object on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GetChatMember {
     pub chat_id: ChatTarget,
+    pub user_id: i32,
 }
 
 
+/// Use this method to edit text and game messages sent by the bot or via the bot (for inline bots).
+/// On success, if edited message is sent by the bot, the edited [`Message`] is returned,
+/// otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct EditMessageText {
-    chat_id: Option<ChatTarget>,
-    message_id: Option<i32>,
-    inline_message_id: Option<String>,
-    text: String,
-    parse_mode: Option<ParseMode>,
-    disable_web_page_preview: Option<bool>,
-    reply_markup: Option<InlineKeyboardMarkup>,
+    pub chat_id: Option<ChatTarget>,
+    pub message_id: Option<i32>,
+    pub inline_message_id: Option<String>,
+    pub text: String,
+    pub parse_mode: Option<ParseMode>,
+    pub disable_web_page_preview: Option<bool>,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
 }
 
+/// Use this method to edit captions of messages sent by the bot or via the bot (for inline bots).
+/// On success, if edited message is sent by the bot, the edited [`Message`] is returned,
+/// otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct EditMessageCaption {
-    chat_id: Option<ChatTarget>,
-    message_id: Option<i32>,
-    inline_message_id: Option<String>,
-    caption: Option<String>,
-    parse_mode: Option<ParseMode>,
-    reply_markup: Option<InlineKeyboardMarkup>,
+    pub chat_id: Option<ChatTarget>,
+    pub message_id: Option<i32>,
+    pub inline_message_id: Option<String>,
+    pub caption: Option<String>,
+    pub parse_mode: Option<ParseMode>,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
 }
 
+
+/// Use this method to edit only the reply markup of messages sent by the bot or via the bot (for
+/// inline bots). On success, if edited message is sent by the bot, the edited [`Message`] is returned,
+/// otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct EditMessageReplyMarkup {
-    chat_id: Option<ChatTarget>,
-    message_id: Option<i32>,
-    inline_message_id: Option<String>,
-    reply_markup: Option<InlineKeyboardMarkup>,
+    pub chat_id: Option<ChatTarget>,
+    pub message_id: Option<i32>,
+    pub inline_message_id: Option<String>,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
 }
 
+
+/// Use this method to delete a message, including service messages, with the following limitations:
+///
+/// - A message can only be deleted if it was sent less than 48 hours ago.
+/// - Bots can delete outgoing messages in groups and supergroups.
+/// - Bots granted can_post_messages permissions can delete outgoing messages in channels.
+/// - If the bot is an administrator of a group, it can delete any message there.
+/// - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
+///
+/// Returns True on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct DeleteMessage {
-    chat_id: ChatTarget,
-    message_id: i32,
+    pub chat_id: ChatTarget,
+    pub message_id: i32,
 }

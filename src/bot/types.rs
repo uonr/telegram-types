@@ -779,6 +779,9 @@ pub enum InputMedia {
     },
 }
 
+/// Send *Markdown or HTML*, if you want Telegram apps to show
+/// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options)
+/// in the media caption.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum ParseMode {
     Markdown,

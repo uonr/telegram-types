@@ -1,6 +1,6 @@
 [package]
 name = "telegram_types"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Quan Brew <t@ioover.net>"]
 repository = "https://github.com/quanbrew/telegram-types"
 categories = ["api-bindings"]
