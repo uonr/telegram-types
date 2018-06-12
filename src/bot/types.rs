@@ -1,28 +1,87 @@
-use std::hash::{Hash, Hasher};
+//! Telegram bot object types.
+/// Simple serde helper function that always return false.
+pub(crate) fn falsum() -> bool { false }
 
-pub type Date = i64;
 
-fn falsum() -> bool { false }
+macro_rules! impl_id {
+    ($Id: ident : $Ty: ty) => {
+        #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        pub struct $Id(pub $Ty);
 
+        impl ::std::ops::Add<$Ty> for $Id {
+            type Output = $Id;
+            #[inline]
+            fn add(self, other: $Ty) -> $Id {
+                $Id(self.0 + other)
+            }
+        }
+
+        impl<'a> ::std::ops::Add<&'a $Ty> for $Id {
+            type Output = $Id;
+            #[inline]
+            fn add(self, other: &$Ty) -> Self::Output {
+                $Id(self.0 + other)
+            }
+        }
+
+        impl ::std::ops::Sub<$Ty> for $Id {
+            type Output = $Id;
+            #[inline]
+            fn sub(self, other: $Ty) -> $Id {
+                $Id(self.0 - other)
+            }
+        }
+        impl ::std::ops::AddAssign<$Ty> for $Id {
+            fn add_assign(&mut self, rhs: $Ty) {
+                self.0 += rhs
+            }
+        }
+        impl ::std::ops::SubAssign<$Ty> for $Id {
+            fn sub_assign(&mut self, rhs: $Ty) {
+                self.0 -= rhs
+            }
+        }
+    };
+}
+
+
+/// Unique identifier for user.
+impl_id! {UserId : i64}
 
 /// Unique identifier for this chat.
+impl_id! {ChatId : i64}
+
+/// Unique message identifier inside a chat
+impl_id! {MessageId : i64}
+
+
+/// The update‘s unique identifier.
+///
+/// Update identifiers start from a certain positive number and increase sequentially.
+/// This ID becomes especially handy if you’re using Webhooks,
+/// since it allows you to ignore repeated updates or to restore the correct update sequence,
+/// should they get out of order. If there are no new updates for at least a week,
+/// then identifier of the next update will be chosen randomly instead of sequentially.
+impl_id! {UpdateId : i64}
+
+
+/// Unique identifier for a file
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct ChatId(pub i64);
+pub struct FileId(pub String);
+
+/// The UNIX timestamp
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Timestamp(pub u64);
+
 
 
 /// An incoming update.
 ///
 /// At most one of the optional parameters can be present in any given update.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub struct Update {
     /// The update‘s unique identifier.
-    ///
-    /// Update identifiers start from a certain positive number and increase sequentially.
-    /// This ID becomes especially handy if you’re using Webhooks,
-    /// since it allows you to ignore repeated updates or to restore the correct update sequence,
-    /// should they get out of order. If there are no new updates for at least a week,
-    /// then identifier of the next update will be chosen randomly instead of sequentially.
-    pub update_id: i32,
+    pub update_id: UpdateId,
     /// New incoming message of any kind — text, photo, sticker, etc.
     pub message: Option<Box<Message>>,
     /// New version of a message that is known to the bot and was edited
@@ -47,7 +106,7 @@ pub struct WebhookInfo {
     pub pending_update_count: i32,
     /// Unix time for the most recent error that happened when trying to deliver an update via
     /// webhook
-    pub last_error_date: Option<Date>,
+    pub last_error_date: Option<Timestamp>,
     /// Error message in human-readable format for the most recent error that happened when trying
     /// to deliver an update via webhook
     pub last_error_message: Option<String>,
@@ -63,7 +122,7 @@ pub struct WebhookInfo {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct User {
     /// Unique identifier for this user or bot
-    pub id: i32,
+    pub id: UserId,
     /// True, if this user is a bot
     pub is_bot: bool,
     /// User‘s or bot’s first name
@@ -80,7 +139,7 @@ pub struct User {
 /// Type of chat
 #[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub enum ChatType {
     Private {
         username: Option<String>,
@@ -126,7 +185,7 @@ pub enum ChatType {
 }
 
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub struct Chat {
     /// Unique identifier for this chat.
     pub id: ChatId,
@@ -140,14 +199,14 @@ pub struct Chat {
 
 
 // TODO: game, video, invoice, successful_payment
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub struct Message {
     /// Unique message identifier inside this chat
-    pub message_id: i32,
+    pub message_id: MessageId,
     /// Sender, empty for messages sent to channels
     pub from: Option<Box<User>>,
     /// Date the message was sent in Unix time
-    pub date: Date,
+    pub date: Timestamp,
     /// Conversation the message belongs to
     pub chat: Box<Chat>,
     /// For forwarded messages, sender of the original message
@@ -155,17 +214,17 @@ pub struct Message {
     /// For messages forwarded from channels, information about the original channel
     pub forward_from_chat: Option<Box<Chat>>,
     /// For messages forwarded from channels, identifier of the original message in the channel
-    pub forward_from_message_id: Option<i32>,
+    pub forward_from_message_id: Option<MessageId>,
     /// For messages forwarded from channels, signature of the post author if present
     pub forward_signature: Option<String>,
     /// For forwarded messages, date the original message was sent in Unix time
-    pub forward_date: Option<Date>,
+    pub forward_date: Option<Timestamp>,
     /// For replies, the original message.
     /// Note that the Message object in this field will not contain
     /// further `reply_to_message` fields even if it itself is a reply.
     pub reply_to_message: Option<Box<Message>>,
     /// Date the message was last edited in Unix time
-    pub edit_date: Option<Date>,
+    pub edit_date: Option<Timestamp>,
     /// The unique identifier of a media message group this message belongs to
     pub media_group_id: Option<String>,
     /// Signature of the post author for messages in channels
@@ -244,7 +303,7 @@ pub struct Message {
 
 /// One special entity in a text message.
 /// For example, hashtags, usernames, URLs, etc.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct MessageEntity {
     /// Type of the entity.
     #[serde(rename="type")]
@@ -285,10 +344,10 @@ pub enum MessageEntityKind {
 
 /// A general file (as opposed to [photos](PhotoSize), [voice messages](Voice) and
 /// [audio files](Audio)).
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct Document {
     /// Unique file identifier
-    pub file_id: i32,
+    pub file_id: FileId,
     /// Document thumbnail as defined by sender
     pub thumb: Option<PhotoSize>,
     /// Original filename as defined by sender
@@ -299,10 +358,10 @@ pub struct Document {
 }
 
 /// An audio file to be treated as music by the Telegram clients.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct Audio {
     /// Unique identifier for this file
-    pub file_id: i32,
+    pub file_id: FileId,
     /// Duration of the audio in seconds as defined by sender
     pub duration: i32,
     /// Performer of the audio as defined by sender or by audio tags
@@ -316,10 +375,10 @@ pub struct Audio {
 
 
 /// A voice note.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct Voice {
     /// Unique identifier for this file
-    pub file_id: i32,
+    pub file_id: FileId,
     /// Duration of the audio in seconds as defined by sender
     pub duration: i32,
     /// MIME type of the file as defined by sender
@@ -328,10 +387,10 @@ pub struct Voice {
 }
 
 /// A video message (available in Telegram apps as of v.4.0).
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct VideoNote {
     /// Unique identifier for this file
-    pub file_id: i32,
+    pub file_id: FileId,
     /// Video width and height as defined by sender
     pub length: i32,
     /// Duration of the audio in seconds as defined by sender
@@ -346,7 +405,7 @@ pub struct Contact {
     pub phone_number: String,
     pub first_name: String,
     pub last_name: Option<String>,
-    pub user_id: Option<i32>,
+    pub user_id: Option<UserId>,
 }
 
 
@@ -357,7 +416,7 @@ pub struct Contact {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct File {
     /// Unique identifier for this file
-    pub file_id: String,
+    pub file_id: FileId,
     /// File size, if known
     pub file_size: Option<i32>,
     /// Optional. File path. Use `https://api.telegram.org/file/bot<token>/<file_path>` to get the file.
@@ -375,17 +434,7 @@ pub struct Location {
 }
 
 
-impl Hash for Location {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        use std::mem::transmute;
-        unsafe {
-            (transmute::<f32, u32>(self.longitude), transmute::<f32, u32>(self.latitude))
-        }.hash(state);
-    }
-}
-
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub struct Venue {
     /// Venue location
     pub location: Location,
@@ -402,7 +451,7 @@ pub struct Venue {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct PhotoSize {
     /// Unique identifier for this file
-    pub file_id: String,
+    pub file_id: FileId,
     pub width: i32,
     pub height: i32,
     pub file_size: Option<i32>,
@@ -550,7 +599,7 @@ pub enum InlineKeyboardButtonPressed {
 /// you call `answerCallbackQuery`. It is, therefore, necessary to react by calling
 /// `answerCallbackQuery` even if no notification to the user is needed (e.g., without
 /// specifying any of the optional parameters).
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub struct CallbackQuery {
     /// Unique identifier for this query
     pub id: String,
@@ -589,6 +638,7 @@ pub struct ForceReply {
 
 
 /// Contains information about why a request was unsuccessful.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ResponseParameters {
     /// *Optional*. The group has been migrated to a supergroup with the specified identifier.
     pub migrate_to_chat_id: Option<ChatId>,
@@ -602,10 +652,10 @@ pub struct ResponseParameters {
 pub struct ChatPhoto {
     /// Unique file identifier of small (160x160) chat photo.
     /// This file_id can be used only for photo download.
-    pub small_file_id: String,
+    pub small_file_id: FileId,
     /// Unique file identifier of big (640x640) chat photo.
     /// This file_id can be used only for photo download.
-    pub big_file_id: String,
+    pub big_file_id: FileId,
 }
 
 /// This object contains information about one member of a chat.
@@ -616,7 +666,7 @@ pub struct ChatMember {
     /// The member's status in the chat.
     pub status: ChatMemberStatus,
     /// Restricted and kicked only. Date when restrictions will be lifted for this user, unix time
-    pub until_date: Option<Date>,
+    pub until_date: Option<Timestamp>,
     /// Administrators only. True, if the bot is allowed to edit administrator privileges of
     /// that user
     pub can_be_edited: Option<bool>,
@@ -666,19 +716,19 @@ pub enum ChatMemberStatus {
 }
 
 /////
-//#[derive(Serialize, Deserialize,  Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+//#[derive(Serialize, Deserialize,  Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 //pub struct InputFile {
 //
 //}
 /////
-//#[derive(Serialize, Deserialize,  Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+//#[derive(Serialize, Deserialize,  Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 //pub struct InputMedia {
 //
 //}
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub struct Sticker {
-    pub file_id: String,
+    pub file_id: FileId,
     pub width: i32,
     pub height: i32,
     pub thumb: Option<PhotoSize>,
@@ -693,7 +743,7 @@ pub struct Sticker {
 }
 
 /// A sticker set.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub struct StickerSet {
     /// Sticker set name
     pub name: String,
@@ -723,20 +773,10 @@ pub struct MaskPosition {
 }
 
 
-impl Hash for MaskPosition {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        use std::mem::transmute;
-        let force = |e: f32| unsafe { transmute::<f32, u32>(e) };
-
-        self.point.hash(state);
-        (force(self.x_shift), force(self.y_shift), force(self.scale)).hash(state);
-    }
-}
-
 
 /// The content of a media message to be sent.
 #[serde(tag = "type")]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub enum InputMedia {
     #[serde(rename = "video")]
     Video {
@@ -748,7 +788,8 @@ pub enum InputMedia {
         /// under <file_attach_name> name.
         ///
         /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
-        media: String,
+        media: FileId,
+        // TODO: url and attach
         /// *Optional*. Caption of the photo to be sent, 0-200 characters
         caption: Option<String>,
         /// *Optional*. Send Markdown or HTML, if you want Telegram apps to show
@@ -771,7 +812,7 @@ pub enum InputMedia {
         /// under <file_attach_name> name.
         ///
         /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
-        media: String,
+        media: FileId,
         /// *Optional*. Caption of the photo to be sent, 0-200 characters
         caption: Option<String>,
         /// *Optional*. Send Markdown or HTML, if you want Telegram apps to show
