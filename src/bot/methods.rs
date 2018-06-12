@@ -42,7 +42,7 @@ pub struct UpdateList (pub Vec<types::Update>);
 /// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified
 /// url, containing a JSON-serialized [`Update`]. In case of an unsuccessful request, we will give up
 /// after a reasonable amount of attempts. Returns True on success.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Eq, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SetWebhook {
     pub url: String,
     // certificate
