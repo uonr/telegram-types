@@ -1,7 +1,9 @@
 //! Telegram bot object types.
+#[cfg(feature = "high")]
+use chrono::naive::NaiveDateTime;
+
 /// Simple serde helper function that always return false.
 pub(crate) fn falsum() -> bool { false }
-
 
 macro_rules! impl_id {
     ($Id: ident : $Ty: ty) => {
@@ -70,10 +72,43 @@ impl_id! {UpdateId : i64}
 pub struct FileId(pub String);
 
 /// The UNIX timestamp
+#[cfg(not(feature = "high"))]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Timestamp(pub u64);
+pub struct Time(pub u64);
 
+/// The Datetime.
+#[cfg(feature = "high")]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Time(
+    #[serde(with = "timestamp_format")]
+    pub NaiveDateTime
+);
 
+#[cfg(feature = "high")]
+mod timestamp_format {
+    use chrono::naive::NaiveDateTime;
+    use serde::{Deserialize, Deserializer, Serializer};
+
+    pub fn serialize<S>(
+        date: &NaiveDateTime,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+    {
+        serializer.serialize_i64(date.timestamp())
+    }
+
+    pub fn deserialize<'de, D>(
+        deserializer: D,
+    ) -> Result<NaiveDateTime, D::Error>
+        where
+            D: Deserializer<'de>,
+    {
+        let s = i64::deserialize(deserializer)?;
+        Ok(NaiveDateTime::from_timestamp(s, 0))
+    }
+}
 
 /// An incoming update.
 ///
@@ -106,7 +141,7 @@ pub struct WebhookInfo {
     pub pending_update_count: i32,
     /// Unix time for the most recent error that happened when trying to deliver an update via
     /// webhook
-    pub last_error_date: Option<Timestamp>,
+    pub last_error_date: Option<Time>,
     /// Error message in human-readable format for the most recent error that happened when trying
     /// to deliver an update via webhook
     pub last_error_message: Option<String>,
@@ -206,7 +241,7 @@ pub struct Message {
     /// Sender, empty for messages sent to channels
     pub from: Option<Box<User>>,
     /// Date the message was sent in Unix time
-    pub date: Timestamp,
+    pub date: Time,
     /// Conversation the message belongs to
     pub chat: Box<Chat>,
     /// For forwarded messages, sender of the original message
@@ -218,13 +253,13 @@ pub struct Message {
     /// For messages forwarded from channels, signature of the post author if present
     pub forward_signature: Option<String>,
     /// For forwarded messages, date the original message was sent in Unix time
-    pub forward_date: Option<Timestamp>,
+    pub forward_date: Option<Time>,
     /// For replies, the original message.
     /// Note that the Message object in this field will not contain
     /// further `reply_to_message` fields even if it itself is a reply.
     pub reply_to_message: Option<Box<Message>>,
     /// Date the message was last edited in Unix time
-    pub edit_date: Option<Timestamp>,
+    pub edit_date: Option<Time>,
     /// The unique identifier of a media message group this message belongs to
     pub media_group_id: Option<String>,
     /// Signature of the post author for messages in channels
@@ -666,7 +701,7 @@ pub struct ChatMember {
     /// The member's status in the chat.
     pub status: ChatMemberStatus,
     /// Restricted and kicked only. Date when restrictions will be lifted for this user, unix time
-    pub until_date: Option<Timestamp>,
+    pub until_date: Option<Time>,
     /// Administrators only. True, if the bot is allowed to edit administrator privileges of
     /// that user
     pub can_be_edited: Option<bool>,
@@ -830,15 +865,3 @@ pub enum ParseMode {
     Markdown,
     HTML,
 }
-
-
-/////
-//#[derive(Serialize, Deserialize,  Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-//struct InlineQuery {
-//
-//}
-/////
-//#[derive(Serialize, Deserialize,  Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-//struct InlineQueryResult {
-//
-//}
