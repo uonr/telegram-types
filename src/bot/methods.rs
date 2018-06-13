@@ -1,8 +1,8 @@
 //! Request parameters types of Telegram bot methods.
 use std::default::Default;
 use super::types;
-use super::types::{ChatId, ForceReply, InlineKeyboardMarkup, MessageId, ParseMode, ReplyKeyboardMarkup,
-                   ReplyKeyboardRemove, UpdateId, UserId};
+use super::types::{Chat, ChatId, ForceReply, InlineKeyboardMarkup, Message, MessageId,
+                   ParseMode, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, UpdateId, UserId};
 
 
 /// Chat integer identifier or username

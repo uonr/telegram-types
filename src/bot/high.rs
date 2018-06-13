@@ -108,3 +108,4 @@ impl Drop for PollingStream {
         let _ = self.control.send(Signal::Stop);
     }
 }
+
