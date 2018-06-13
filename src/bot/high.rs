@@ -109,11 +109,11 @@ impl Iterator for PollingUpdater {
     }
 }
 
-
-impl Drop for PollingUpdater {
-    fn drop(&mut self) {
-        if let Some(ref tx) = self.control {
-            tx.send(Signal::Stop);
-        }
-    }
-}
+//
+//impl Drop for PollingUpdater {
+//    fn drop(&mut self) {
+//        if let Some(ref tx) = self.control {
+//            tx.send(Signal::Stop);
+//        }
+//    }
+//}
