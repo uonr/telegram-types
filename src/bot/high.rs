@@ -71,13 +71,13 @@ impl PollingUpdater {
                     .post(url.clone())
                     .json(&param)
                     .send()
-                    .unwrap()
+                    .expect("get response error")
                     .text()
-                    .unwrap();
-                let UpdateList(updates) = from_result::<UpdateList>(&*body).unwrap();
+                    .expect("get body error");
+                let UpdateList(updates) = from_result::<UpdateList>(&*body).expect("parse error");
                 for update in updates {
                     param.offset = Some(update.update_id.clone() + 1);
-                    tx_updates.send(update).unwrap();
+                    tx_updates.send(update).expect("send update error");
                 }
             }
         });
