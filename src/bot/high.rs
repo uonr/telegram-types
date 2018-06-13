@@ -2,15 +2,13 @@
 use bot::methods;
 use bot::methods::UpdateList;
 use bot::types;
-use reqwest;
-use reqwest::{Client, Response, Url};
+use reqwest::{Client, Url};
 use serde;
 use serde_json;
 use std::iter::Iterator;
 use std::sync::Arc;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread;
-
 
 #[derive(PartialEq)]
 enum Signal {
@@ -30,9 +28,6 @@ pub struct PollingUpdater {
     base_url: Url,
     param: methods::GetUpdates,
     client: Arc<Client>,
-    response: Option<Receiver<reqwest::Result<Response>>>,
-    control: Option<Sender<Signal>>,
-    updates: Vec<types::Update>,
 }
 
 
@@ -45,9 +40,6 @@ impl PollingUpdater {
             token,
             base_url,
             client: Arc::new(client),
-            response: None,
-            control: None,
-            updates: Vec::new(),
         }
     }
     pub fn new(token: String) -> PollingUpdater {
@@ -63,57 +55,56 @@ impl PollingUpdater {
             ..self
         }
     }
-}
 
-impl Iterator for PollingUpdater {
-    type Item = types::Update;
-
-    fn next(&mut self) -> Option<types::Update> {
-        if self.updates.is_empty() {
-            if let None = self.response {
-                let (tx_control, rx_control) = channel();
-                let (tx_updates, rx_updates) = channel();
-                self.response = Some(rx_updates);
-                self.control = Some(tx_control);
-                let url = self.base_url.join("getUpdates")
-                    .expect("get updates url parse error");
-                let param = self.param.clone();
-                let client = self.client.clone();
-                thread::spawn(move || {
-                    let mut param = param;
-                    let control_signal = rx_control;
-                    while control_signal.try_recv() != Ok(Signal::Stop) {
-                        let response = client
-                            .post(url.clone())
-                            .json(&param)
-                            .send();
-                        tx_updates.send(response);
-                    }
-                });
-            }
-            let rx = self.response.as_mut().unwrap();
-            loop {
-                let body = rx.recv().unwrap().unwrap().text().unwrap();
-                let UpdateList(mut updates) = from_result::<UpdateList>(&*body).unwrap();
-                if !updates.is_empty() {
-                    updates.reverse();
-                    self.updates = updates;
-                    break;
+    pub fn iter(&self) -> PollingStream {
+        let (tx_control, rx_control) = channel();
+        let (tx_updates, rx_updates) = channel();
+        let url = self.base_url.join("getUpdates")
+            .expect("get updates url parse error");
+        let param = self.param.clone();
+        let client = self.client.clone();
+        thread::spawn(move || {
+            let mut param = param;
+            let control_signal = rx_control;
+            while control_signal.try_recv() != Ok(Signal::Stop) {
+                let body = client
+                    .post(url.clone())
+                    .json(&param)
+                    .send()
+                    .unwrap()
+                    .text()
+                    .unwrap();
+                let UpdateList(updates) = from_result::<UpdateList>(&*body).unwrap();
+                for update in updates {
+                    param.offset = Some(update.update_id.clone() + 1);
+                    tx_updates.send(update).unwrap();
                 }
             }
+        });
+        PollingStream {
+            updates: rx_updates,
+            control: tx_control,
         }
-        if let Some(update) = self.updates.pop() {
-            self.param.offset = Some(update.update_id.clone() + 1);
-            return Some(update);
-        } else { unreachable!(); }
     }
 }
 
-//
-//impl Drop for PollingUpdater {
-//    fn drop(&mut self) {
-//        if let Some(ref tx) = self.control {
-//            tx.send(Signal::Stop);
-//        }
-//    }
-//}
+
+pub struct PollingStream {
+    updates: Receiver<types::Update>,
+    control: Sender<Signal>,
+}
+
+
+impl Iterator for PollingStream {
+    type Item = types::Update;
+
+    fn next(&mut self) -> Option<types::Update> {
+        self.updates.recv().ok()
+    }
+}
+
+impl Drop for PollingStream {
+    fn drop(&mut self) {
+        let _ = self.control.send(Signal::Stop);
+    }
+}
