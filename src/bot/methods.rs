@@ -1,9 +1,12 @@
 //! Request parameters types of Telegram bot methods.
+use serde::{Deserialize, Deserializer};
+use std::convert::Into;
 use std::default::Default;
+use std::error::Error;
+use std::fmt;
 use super::types;
 use super::types::{ChatId, ForceReply, InlineKeyboardMarkup, MessageId,
                    ParseMode, ReplyKeyboardMarkup, ReplyKeyboardRemove, UpdateId, UserId};
-
 
 /// Chat integer identifier or username
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -35,8 +38,45 @@ impl GetUpdates {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Default)]
-pub struct UpdateList (pub Vec<types::Update>);
+pub struct ApiError {
+    error_code: i32,
+    description: String,
+}
+
+impl fmt::Display for ApiError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[ERROR {}] {}", self.error_code, self.description)
+    }
+}
+
+
+impl Error for ApiError {
+    fn description(&self) -> &str {
+        self.description.as_ref()
+    }
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[serde(untagged)]
+pub enum UpdateList {
+    Err(ApiError),
+    Ok { result: Vec<types::Update> },
+}
+
+
+impl Into<Result<Vec<types::Update>, ApiError>> for UpdateList {
+    fn into(self) -> Result<Vec<types::Update>, ApiError> {
+        match self {
+            UpdateList::Err(e) => Err(e),
+            UpdateList::Ok { result: xs } => Ok(xs),
+        }
+    }
+}
+
+
 
 /// Use this method to specify a url and receive incoming updates via an outgoing webhook.
 /// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified

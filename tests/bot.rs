@@ -3,7 +3,7 @@ extern crate serde_json;
 extern crate telegram_types;
 
 use serde_json::Value;
-use telegram_types::bot::{types, methods};
+use telegram_types::bot::{methods, types};
 
 pub fn from_result<T>(raw: &str) -> serde_json::Result<T>
     where T: for<'de> serde::Deserialize<'de> {
@@ -56,8 +56,21 @@ fn message() {
     let _chat = serde_json::from_str::<types::Message>(raw).unwrap();
 }
 
+
 #[test]
 fn update() {
     let raw = include_str!("json/update.json");
-    let _update = from_result::<methods::UpdateList>(&raw).unwrap();
+    let update: Result<_, _> = serde_json::from_str::<methods::UpdateList>(&raw).unwrap().into();
+    let _ = update.unwrap();
 }
+
+
+#[test]
+#[should_panic]
+fn failure() {
+    let raw = include_str!("json/error.json");
+    let update: Result<_, _> = serde_json::from_str::<methods::UpdateList>(&raw).unwrap().into();
+    let _ = update.unwrap();
+}
+
+
