@@ -46,7 +46,7 @@ pub struct UpdateList (pub Vec<types::Update>);
 pub struct SetWebhook {
     pub url: String,
     // certificate
-    pub ax_connections: Option<i32>,
+    pub max_connections: Option<i32>,
     pub allowed_updates: Option<Vec<String>>,
 }
 
@@ -55,7 +55,7 @@ impl SetWebhook {
     pub fn new(url: String) -> SetWebhook {
         SetWebhook {
             url,
-            ax_connections: None,
+            max_connections: None,
             allowed_updates: None,
         }
     }

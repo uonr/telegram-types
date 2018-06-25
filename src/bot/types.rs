@@ -149,7 +149,6 @@ pub struct WebhookInfo {
     pub max_connections: Option<i32>,
     /// A list of update types the bot is subscribed to. Defaults to all update types
     pub allowed_updates: Option<Vec<String>>,
-
 }
 
 
