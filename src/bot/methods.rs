@@ -1,8 +1,8 @@
 //! Request parameters types of Telegram bot methods.
 use std::default::Default;
 use super::types;
-use super::types::{Chat, ChatId, ForceReply, InlineKeyboardMarkup, Message, MessageId,
-                   ParseMode, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, UpdateId, UserId};
+use super::types::{ChatId, ForceReply, InlineKeyboardMarkup, MessageId,
+                   ParseMode, ReplyKeyboardMarkup, ReplyKeyboardRemove, UpdateId, UserId};
 
 
 /// Chat integer identifier or username
@@ -15,7 +15,7 @@ pub enum ChatTarget {
 
 /// Use this method to receive incoming updates using long
 /// polling ([wiki](https://en.wikipedia.org/wiki/Push_technology#Long_polling)).
-/// An Array of [`Update`] objects is returned.
+/// An Array of [`Update`](types::Update) objects is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct GetUpdates {
     pub offset: Option<UpdateId>,
@@ -40,7 +40,7 @@ pub struct UpdateList (pub Vec<types::Update>);
 
 /// Use this method to specify a url and receive incoming updates via an outgoing webhook.
 /// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified
-/// url, containing a JSON-serialized [`Update`]. In case of an unsuccessful request, we will give up
+/// url, containing a JSON-serialized [`Update`](types::Update). In case of an unsuccessful request, we will give up
 /// after a reasonable amount of attempts. Returns True on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SetWebhook {
@@ -159,8 +159,8 @@ pub struct GetChatMember {
 
 
 /// Use this method to edit text and game messages sent by the bot or via the bot (for inline bots).
-/// On success, if edited message is sent by the bot, the edited [`Message`] is returned,
-/// otherwise True is returned.
+/// On success, if edited message is sent by the bot, the edited [`Message`](types::Message) is
+/// returned, otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct EditMessageText {
     pub chat_id: Option<ChatTarget>,
@@ -173,8 +173,8 @@ pub struct EditMessageText {
 }
 
 /// Use this method to edit captions of messages sent by the bot or via the bot (for inline bots).
-/// On success, if edited message is sent by the bot, the edited [`Message`] is returned,
-/// otherwise True is returned.
+/// On success, if edited message is sent by the bot, the edited [`Message`](types::Message) is
+/// returned, otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct EditMessageCaption {
     pub chat_id: Option<ChatTarget>,
@@ -187,8 +187,8 @@ pub struct EditMessageCaption {
 
 
 /// Use this method to edit only the reply markup of messages sent by the bot or via the bot (for
-/// inline bots). On success, if edited message is sent by the bot, the edited [`Message`] is returned,
-/// otherwise True is returned.
+/// inline bots). On success, if edited message is sent by the bot, the edited [`Message`](types::Message)
+/// is returned, otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct EditMessageReplyMarkup {
     pub chat_id: Option<ChatTarget>,
