@@ -75,24 +75,6 @@ impl Error for ApiError {
 }
 
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
-#[serde(untagged)]
-pub enum UpdateList {
-    Err(ApiError),
-    Ok { result: Vec<types::Update> },
-}
-
-
-impl Into<Result<Vec<types::Update>, ApiError>> for UpdateList {
-    fn into(self) -> Result<Vec<types::Update>, ApiError> {
-        match self {
-            UpdateList::Err(e) => Err(e),
-            UpdateList::Ok { result: xs } => Ok(xs),
-        }
-    }
-}
-
-
 
 /// Use this method to specify a url and receive incoming updates via an outgoing webhook.
 /// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified
@@ -278,6 +260,8 @@ pub struct TelegramResult<T> // WTF! JUST WORK!
 {
     pub ok: bool,
     pub description: Option<String>,
-    pub result: T,
+    pub err_code: Option<i32>,
+    pub result: Option<T>,
 }
 
+pub type UpdateList = TelegramResult<Vec<types::Update>>;

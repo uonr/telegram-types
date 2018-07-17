@@ -60,8 +60,7 @@ fn message() {
 #[test]
 fn update() {
     let raw = include_str!("json/update.json");
-    let update: Result<_, _> = serde_json::from_str::<methods::UpdateList>(&raw).unwrap().into();
-    let _ = update.unwrap();
+    let _updates = serde_json::from_str::<methods::UpdateList>(&raw).unwrap();
 }
 
 
@@ -69,8 +68,8 @@ fn update() {
 #[should_panic]
 fn failure() {
     let raw = include_str!("json/error.json");
-    let update: Result<_, _> = serde_json::from_str::<methods::UpdateList>(&raw).unwrap().into();
-    let _ = update.unwrap();
+    let update = serde_json::from_str::<methods::UpdateList>(&raw).unwrap();
+    let _ = update.result.unwrap();
 }
 
 
