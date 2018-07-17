@@ -1,5 +1,6 @@
 //! Request parameters types of Telegram bot methods.
 use serde::{Deserialize, Deserializer};
+use serde::de::DeserializeOwned;
 use std::convert::Into;
 use std::default::Default;
 use std::error::Error;
@@ -8,6 +9,20 @@ use super::types;
 use super::types::{ChatId, ForceReply, InlineKeyboardMarkup, MessageId,
                    ParseMode, ReplyKeyboardMarkup, ReplyKeyboardRemove, UpdateId, UserId};
 
+
+pub trait Method {
+    const NAME: &'static str;
+}
+
+macro_rules! impl_method {
+    ($Type: ident, $name: expr) => {
+        impl Method for $Type {
+            const NAME: &'static str = $name;
+        }
+    };
+}
+
+
 /// Chat integer identifier or username
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[serde(untagged)]
@@ -15,6 +30,7 @@ pub enum ChatTarget {
     Id(ChatId),
     Username(String),
 }
+
 
 /// Use this method to receive incoming updates using long
 /// polling ([wiki](https://en.wikipedia.org/wiki/Push_technology#Long_polling)).
@@ -252,3 +268,16 @@ pub struct DeleteMessage {
     pub chat_id: ChatTarget,
     pub message_id: MessageId,
 }
+
+impl_method!(GetUpdates, "getUpdates");
+
+
+
+#[derive(Deserialize)]
+pub struct TelegramResult<T> // WTF! JUST WORK!
+{
+    pub ok: bool,
+    pub description: Option<String>,
+    pub result: T,
+}
+
