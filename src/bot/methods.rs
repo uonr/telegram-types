@@ -1,4 +1,6 @@
 //! Request parameters types of Telegram bot methods.
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 use std::default::Default;
 use std::error::Error;
 use std::fmt;
@@ -246,11 +248,11 @@ pub struct DeleteWebhook;
 pub struct GetWebhookInfo;
 
 /// Telegram methods.
-pub trait Method {
+pub trait Method: Serialize {
     /// Method name in the Telegram Bot API url.
     const NAME: &'static str;
     /// Method return type.
-    type Item;
+    type Item: DeserializeOwned;
 
     /// Get method url.
     fn url(token: String) -> String {
