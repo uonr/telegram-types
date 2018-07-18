@@ -65,11 +65,10 @@ fn update() {
 
 
 #[test]
-#[should_panic]
 fn failure() {
     let raw = include_str!("json/error.json");
     let update = serde_json::from_str::<methods::UpdateList>(&raw).unwrap();
-    let _ = update.result.unwrap();
+    assert!(update.result.is_none());
 }
 
 

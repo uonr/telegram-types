@@ -1,26 +1,10 @@
 //! Request parameters types of Telegram bot methods.
-use serde::{Deserialize, Deserializer};
-use serde::de::DeserializeOwned;
-use std::convert::Into;
 use std::default::Default;
 use std::error::Error;
 use std::fmt;
 use super::types;
 use super::types::{ChatId, ForceReply, InlineKeyboardMarkup, MessageId,
                    ParseMode, ReplyKeyboardMarkup, ReplyKeyboardRemove, UpdateId, UserId};
-
-
-pub trait Method {
-    const NAME: &'static str;
-}
-
-macro_rules! impl_method {
-    ($Type: ident, $name: expr) => {
-        impl Method for $Type {
-            const NAME: &'static str = $name;
-        }
-    };
-}
 
 
 /// Chat integer identifier or username
@@ -251,11 +235,55 @@ pub struct DeleteMessage {
     pub message_id: MessageId,
 }
 
-impl_method!(GetUpdates, "getUpdates");
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GetMe;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DeleteWebhook;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GetWebhookInfo;
+
+/// Telegram methods.
+pub trait Method {
+    /// Method name in the Telegram Bot API url.
+    const NAME: &'static str;
+    /// Method return type.
+    type Item;
+
+    /// Get method url.
+    fn url(token: String) -> String {
+        format!("https://api.telegram.org/bot{}/{}", token, Self::NAME)
+    }
+}
+
+macro_rules! impl_method {
+    ($Type: ty, $name: expr, $Item: ty) => {
+        impl Method for $Type {
+            const NAME: &'static str = $name;
+            type Item = $Item;
+        }
+    };
+
+    ($Type: ty, $name: expr) => { impl_method!($Type, $name, bool); };
+}
 
 
+impl_method!(GetUpdates, "getUpdates", Vec<types::Update>);
+impl_method!(GetMe, "getMe", types::User);
+impl_method!(SetWebhook, "setWebhook");
+impl_method!(DeleteWebhook, "deleteWebhook");
+impl_method!(GetWebhookInfo, "getWebhookInfo", types::WebhookInfo);
+impl_method!(GetChat, "getChat", types::Chat);
+impl_method!(SendMessage, "sendMessage", types::Message);
+impl_method!(ForwardMessage, "forwardMessage", types::Message);
+impl_method!(EditMessageText, "editMessageText", types::Message);
+impl_method!(DeleteMessage, "deleteMessage");
+impl_method!(EditMessageCaption, "editMessageCaption");
 
-#[derive(Deserialize)]
+
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TelegramResult<T> // WTF! JUST WORK!
 {
     pub ok: bool,
