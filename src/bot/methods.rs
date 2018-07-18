@@ -255,7 +255,7 @@ pub trait Method: Serialize {
     type Item: DeserializeOwned + 'static;
 
     /// Get method url.
-    fn url(token: String) -> String {
+    fn url(token: &str) -> String {
         format!("https://api.telegram.org/bot{}/{}", token, Self::NAME)
     }
 }
