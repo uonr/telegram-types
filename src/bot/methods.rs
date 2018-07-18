@@ -252,7 +252,7 @@ pub trait Method: Serialize {
     /// Method name in the Telegram Bot API url.
     const NAME: &'static str;
     /// Method return type.
-    type Item: DeserializeOwned;
+    type Item: DeserializeOwned + 'static;
 
     /// Get method url.
     fn url(token: String) -> String {
