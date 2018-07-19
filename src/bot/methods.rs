@@ -23,9 +23,13 @@ pub enum ChatTarget {
 /// An Array of [`Update`](types::Update) objects is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct GetUpdates {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<UpdateId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub timeout: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub allowed_updates: Option<Vec<String>>,
 }
 
@@ -70,7 +74,9 @@ impl Error for ApiError {
 pub struct SetWebhook {
     pub url: String,
     // certificate
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_connections: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub allowed_updates: Option<Vec<String>>,
 }
 
@@ -101,6 +107,7 @@ pub enum ReplyMarkup {
 pub struct SendMessage {
     pub chat_id: ChatTarget,
     pub text: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub parse_mode: Option<ParseMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_web_page_preview: Option<bool>,
@@ -118,7 +125,7 @@ impl SendMessage {
         SendMessage {
             chat_id,
             text,
-            parse_mode: Some(ParseMode::Markdown),
+            parse_mode: None,
             disable_web_page_preview: Some(false),
             reply_to_message_id: None,
             disable_notification: Some(false),
@@ -148,7 +155,9 @@ pub struct ForwardMessage {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GetUserProfilePhotos {
     pub user_id: UserId,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i32>,
 }
 
@@ -191,12 +200,18 @@ pub struct GetChatMember {
 /// returned, otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct EditMessageText {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub chat_id: Option<ChatTarget>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub message_id: Option<MessageId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub inline_message_id: Option<String>,
     pub text: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub parse_mode: Option<ParseMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_web_page_preview: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_markup: Option<InlineKeyboardMarkup>,
 }
 
@@ -205,11 +220,17 @@ pub struct EditMessageText {
 /// returned, otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct EditMessageCaption {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub chat_id: Option<ChatTarget>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub message_id: Option<MessageId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub inline_message_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub caption: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub parse_mode: Option<ParseMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_markup: Option<InlineKeyboardMarkup>,
 }
 
@@ -219,9 +240,13 @@ pub struct EditMessageCaption {
 /// is returned, otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct EditMessageReplyMarkup {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub chat_id: Option<ChatTarget>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub message_id: Option<MessageId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub inline_message_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_markup: Option<InlineKeyboardMarkup>,
 }
 
