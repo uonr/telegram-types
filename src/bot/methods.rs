@@ -147,7 +147,7 @@ impl SendMessage {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SendSticker {
     pub chat_id: ChatTarget,
-    pub sticker: String,
+    pub sticker: types::FileId,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_notification: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -157,7 +157,7 @@ pub struct SendSticker {
 
 
 impl SendSticker {
-    pub fn new(chat_id: ChatTarget, sticker: String) -> SendSticker {
+    pub fn new(chat_id: ChatTarget, sticker: types::FileId) -> SendSticker {
         SendSticker {
             chat_id,
             sticker,
