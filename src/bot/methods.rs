@@ -143,6 +143,31 @@ impl SendMessage {
 }
 
 
+/// Use this method to send .webp stickers.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct SendSticker {
+    pub chat_id: ChatTarget,
+    pub sticker: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disable_notification: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_to_message_id: Option<MessageId>,
+    // reply_markup
+}
+
+
+impl SendSticker {
+    pub fn new(chat_id: ChatTarget, sticker: String) -> SendSticker {
+        SendSticker {
+            chat_id,
+            sticker,
+            disable_notification: None,
+            reply_to_message_id: None,
+        }
+    }
+}
+
+
 /// Use this method to forward messages of any kind. On success, the sent `Message` is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ForwardMessage {
@@ -312,6 +337,7 @@ impl_method!(ForwardMessage, "forwardMessage", types::Message);
 impl_method!(EditMessageText, "editMessageText", types::Message);
 impl_method!(DeleteMessage, "deleteMessage");
 impl_method!(EditMessageCaption, "editMessageCaption");
+impl_method!(SendSticker, "sendSticker", types::Message);
 
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
