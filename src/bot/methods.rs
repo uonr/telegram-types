@@ -73,7 +73,6 @@ impl Error for ApiError {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SetWebhook {
     pub url: String,
-    // certificate
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_connections: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -101,6 +100,7 @@ pub enum ReplyMarkup {
     ReplyKeyboardRemove(ReplyKeyboardRemove),
     ForceReply(ForceReply),
 }
+
 
 /// Send text messages. On success, the sent [`Message`](types::Message) is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -143,32 +143,108 @@ impl SendMessage {
 }
 
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[serde(untagged)]
+pub enum File {
+    Id(types::FileId),
+    Url(String),
+//    Upload,
+}
+
+
 /// Use this method to send .webp stickers.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SendSticker {
     pub chat_id: ChatTarget,
-    pub sticker: types::FileId,
+    pub sticker: File,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_notification: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_to_message_id: Option<MessageId>,
-    // reply_markup
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_markup: Option<ReplyMarkup>,
 }
 
 
 impl SendSticker {
-    pub fn new(chat_id: ChatTarget, sticker: types::FileId) -> SendSticker {
+    pub fn new(chat_id: ChatTarget, sticker: File) -> SendSticker {
         SendSticker {
             chat_id,
             sticker,
             disable_notification: None,
             reply_to_message_id: None,
+            reply_markup: None,
         }
     }
 }
 
 
-/// Use this method to forward messages of any kind. On success, the sent `Message` is returned.
+/// Use this method to send photos.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct SendPhoto {
+    pub chat_id: ChatTarget,
+    pub photo: File,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub caption: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parse_mode: Option<ParseMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disable_notification: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_to_message_id: Option<MessageId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_markup: Option<ReplyMarkup>,
+}
+
+
+impl SendPhoto {
+    pub fn new(chat_id: ChatTarget, photo: File) -> SendPhoto {
+        SendPhoto {
+            chat_id,
+            photo,
+            caption: None,
+            parse_mode: None,
+            disable_notification: None,
+            reply_to_message_id: None,
+            reply_markup: None,
+        }
+    }
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct SendDocument {
+    pub chat_id: ChatTarget,
+    pub document: File,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub caption: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parse_mode: Option<ParseMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disable_notification: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_to_message_id: Option<MessageId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_markup: Option<ReplyMarkup>,
+}
+
+
+impl SendDocument {
+    pub fn new(chat_id: ChatTarget, document: File) -> SendDocument {
+        SendDocument {
+            chat_id,
+            document,
+            caption: None,
+            parse_mode: None,
+            disable_notification: None,
+            reply_to_message_id: None,
+            reply_markup: None,
+        }
+    }
+}
+
+
+/// Use this method to forward messages of any kind.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ForwardMessage {
     pub chat_id: ChatTarget,
@@ -321,23 +397,27 @@ macro_rules! impl_method {
             type Item = $Item;
         }
     };
-
-    ($Type: ty, $name: expr) => { impl_method!($Type, $name, bool); };
 }
 
 
-impl_method!(GetUpdates, "getUpdates", Vec<types::Update>);
-impl_method!(GetMe, "getMe", types::User);
-impl_method!(SetWebhook, "setWebhook");
-impl_method!(DeleteWebhook, "deleteWebhook");
-impl_method!(GetWebhookInfo, "getWebhookInfo", types::WebhookInfo);
-impl_method!(GetChat, "getChat", types::Chat);
-impl_method!(SendMessage, "sendMessage", types::Message);
-impl_method!(ForwardMessage, "forwardMessage", types::Message);
-impl_method!(EditMessageText, "editMessageText", types::Message);
-impl_method!(DeleteMessage, "deleteMessage");
-impl_method!(EditMessageCaption, "editMessageCaption");
-impl_method!(SendSticker, "sendSticker", types::Message);
+//           Type                   Method                   Return
+impl_method!(GetUpdates           , "getUpdates"           , Vec<types::Update>    );
+impl_method!(GetMe                , "getMe"                , types::User           );
+impl_method!(SetWebhook           , "setWebhook"           , bool                  );
+impl_method!(DeleteWebhook        , "deleteWebhook"        , bool                  );
+impl_method!(GetWebhookInfo       , "getWebhookInfo"       , types::WebhookInfo    );
+impl_method!(SendMessage          , "sendMessage"          , types::Message        );
+impl_method!(ForwardMessage       , "forwardMessage"       , types::Message        );
+impl_method!(EditMessageText      , "editMessageText"      , types::Message        );
+impl_method!(DeleteMessage        , "deleteMessage"        , bool                  );
+impl_method!(EditMessageCaption   , "editMessageCaption"   , bool                  );
+impl_method!(SendSticker          , "sendSticker"          , types::Message        );
+impl_method!(SendPhoto            , "sendPhoto"            , types::Message        );
+impl_method!(SendDocument         , "sendDocument"         , types::Message        );
+impl_method!(GetChat              , "getChat"              , types::Chat           );
+impl_method!(GetChatAdministrators, "getChatAdministrators", Vec<types::ChatMember>);
+impl_method!(GetChatMembersCount  , "getChatMembersCount"  , i32                   );
+impl_method!(GetChatMember        , "getChatMember"        , types::ChatMember     );
 
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
