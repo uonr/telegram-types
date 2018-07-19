@@ -102,9 +102,13 @@ pub struct SendMessage {
     pub chat_id: ChatTarget,
     pub text: String,
     pub parse_mode: Option<ParseMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_web_page_preview: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_notification: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_to_message_id: Option<MessageId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_markup: Option<ReplyMarkup>,
 }
 
