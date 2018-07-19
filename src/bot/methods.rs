@@ -114,7 +114,7 @@ impl SendMessage {
         SendMessage {
             chat_id,
             text,
-            parse_mode: None,
+            parse_mode: Some(ParseMode::Markdown),
             disable_web_page_preview: Some(false),
             reply_to_message_id: None,
             disable_notification: Some(false),
