@@ -421,7 +421,7 @@ impl_method!(GetChatMember        , "getChatMember"        , types::ChatMember  
 
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct TelegramResult<T> // WTF! JUST WORK!
+pub struct TelegramResult<T>
 {
     pub ok: bool,
     pub description: Option<String>,

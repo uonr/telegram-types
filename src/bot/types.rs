@@ -1,9 +1,7 @@
 //! Telegram bot object types.
+use bot::utils::falsum;
 #[cfg(feature = "high")]
 use chrono::naive::NaiveDateTime;
-
-/// Simple serde helper function that always return false.
-pub(crate) fn falsum() -> bool { false }
 
 macro_rules! impl_id {
     ($Id: ident : $Ty: ty) => {
