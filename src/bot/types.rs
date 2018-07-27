@@ -115,17 +115,24 @@ mod timestamp_format {
 pub struct Update {
     /// The update‘s unique identifier.
     pub update_id: UpdateId,
+    #[serde(flatten)]
+    pub content: UpdateContent,
+}
+
+// TODO: inline_query, chosen_inline_result, shipping_query, pre_checkout_query
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[serde(rename_all = "snake_case")]
+pub enum UpdateContent {
     /// New incoming message of any kind — text, photo, sticker, etc.
-    pub message: Option<Box<Message>>,
+    Message(Box<Message>),
     /// New version of a message that is known to the bot and was edited
-    pub edited_message: Option<Box<Message>>,
+    EditedMessage(Box<Message>),
     /// New incoming channel post of any kind — text, photo, sticker, etc.
-    pub channel_post: Option<Box<Message>>,
+    ChannelPost(Box<Message>),
     /// New version of a channel post that is known to the bot and was edited
-    pub edited_channel_post: Option<Box<Message>>,
-    // TODO: inline_query, chosen_inline_result, shipping_query, pre_checkout_query
+    EditChannelPost(Box<Message>),
     /// New incoming callback query
-    pub callback_query: Option<CallbackQuery>,
+    CallbackQuery(CallbackQuery),
 }
 
 /// Contains information about the current status of a webhook.

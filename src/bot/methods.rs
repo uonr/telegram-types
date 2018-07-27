@@ -98,6 +98,10 @@ impl SetWebhook {
             allowed_updates: None,
         }
     }
+
+    pub fn max_connections(self, x: i32) -> SetWebhook {
+        SetWebhook { max_connections: Some(x), ..self }
+    }
 }
 
 
@@ -143,12 +147,19 @@ impl SendMessage {
         }
     }
 
-    pub fn reply(chat_id: ChatTarget, text: String, message_id: MessageId) -> SendMessage {
-        let message = Self::new(chat_id, text);
+    pub fn parse_mode(self, mode: ParseMode) -> SendMessage {
+        SendMessage { parse_mode: Some(mode), ..self }
+    }
+
+    pub fn reply(self, message_id: MessageId) -> SendMessage {
         SendMessage {
             reply_to_message_id: Some(message_id),
-            ..message
+            ..self
         }
+    }
+
+    pub fn reply_markup(self, markup: ReplyMarkup) -> Self {
+        Self { reply_markup: Some(markup), ..self }
     }
 }
 
@@ -158,7 +169,6 @@ impl SendMessage {
 pub enum File {
     Id(types::FileId),
     Url(String),
-//    Upload,
 }
 
 
@@ -185,6 +195,15 @@ impl SendSticker {
             reply_to_message_id: None,
             reply_markup: None,
         }
+    }
+
+    pub fn reply(self, reply_to_message_id: MessageId) -> SendSticker {
+        SendSticker { reply_to_message_id: Some(reply_to_message_id), ..self }
+    }
+
+
+    pub fn reply_markup(self, markup: ReplyMarkup) -> Self {
+        Self { reply_markup: Some(markup), ..self }
     }
 }
 
@@ -219,6 +238,20 @@ impl SendPhoto {
             reply_markup: None,
         }
     }
+
+    pub fn parse_mode(self, mode: ParseMode) -> SendPhoto {
+        SendPhoto { parse_mode: Some(mode), ..self }
+    }
+
+
+    pub fn reply(self, reply_to_message_id: MessageId) -> SendPhoto {
+        SendPhoto { reply_to_message_id: Some(reply_to_message_id), ..self }
+    }
+
+
+    pub fn reply_markup(self, markup: ReplyMarkup) -> Self {
+        Self { reply_markup: Some(markup), ..self }
+    }
 }
 
 
@@ -251,6 +284,19 @@ impl SendDocument {
             reply_markup: None,
         }
     }
+
+    pub fn parse_mode(self, mode: ParseMode) -> SendDocument {
+        SendDocument { parse_mode: Some(mode), ..self }
+    }
+
+    pub fn reply(self, reply_to_message_id: MessageId) -> SendDocument {
+        SendDocument { reply_to_message_id: Some(reply_to_message_id), ..self }
+    }
+
+
+    pub fn reply_markup(self, markup: ReplyMarkup) -> Self {
+        Self { reply_markup: Some(markup), ..self }
+    }
 }
 
 
@@ -270,6 +316,17 @@ pub struct GetUserProfilePhotos {
     pub offset: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i32>,
+}
+
+
+impl GetUserProfilePhotos {
+    pub fn new(user_id: UserId) -> GetUserProfilePhotos {
+        GetUserProfilePhotos {
+            user_id,
+            offset: None,
+            limit: None,
+        }
+    }
 }
 
 
@@ -326,6 +383,35 @@ pub struct EditMessageText {
     pub reply_markup: Option<InlineKeyboardMarkup>,
 }
 
+
+impl EditMessageText {
+    pub fn new(chat_id: ChatTarget, message_id: MessageId, text: String) -> EditMessageText {
+        EditMessageText {
+            chat_id: Some(chat_id),
+            message_id: Some(message_id),
+            inline_message_id: None,
+            text,
+            parse_mode: None,
+            disable_web_page_preview: None,
+            reply_markup: None,
+        }
+    }
+
+    pub fn disable_preview(self) -> EditMessageText {
+        EditMessageText { disable_web_page_preview: Some(true), ..self }
+    }
+
+    pub fn parse_mode(self, mode: ParseMode) -> EditMessageText {
+        EditMessageText { parse_mode: Some(mode), ..self }
+    }
+
+    pub fn reply_markup(self, markup: InlineKeyboardMarkup) -> Self {
+        Self { reply_markup: Some(markup), ..self }
+    }
+}
+
+
+
 /// Use this method to edit captions of messages sent by the bot or via the bot (for inline bots).
 /// On success, if edited message is sent by the bot, the edited [`Message`](types::Message) is
 /// returned, otherwise True is returned.
@@ -343,6 +429,32 @@ pub struct EditMessageCaption {
     pub parse_mode: Option<ParseMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_markup: Option<InlineKeyboardMarkup>,
+}
+
+
+impl EditMessageCaption {
+    pub fn new(chat_id: ChatTarget, message_id: MessageId) -> EditMessageCaption {
+        EditMessageCaption {
+            chat_id: Some(chat_id),
+            message_id: Some(message_id),
+            inline_message_id: None,
+            caption: None,
+            parse_mode: None,
+            reply_markup: None,
+        }
+    }
+
+    pub fn caption(self, caption: String) -> EditMessageCaption {
+        EditMessageCaption { caption: Some(caption), ..self }
+    }
+
+    pub fn parse_mode(self, mode: ParseMode) -> EditMessageCaption {
+        EditMessageCaption { parse_mode: Some(mode), ..self }
+    }
+
+    pub fn reply_markup(self, markup: InlineKeyboardMarkup) -> Self {
+        Self { reply_markup: Some(markup), ..self }
+    }
 }
 
 
@@ -443,7 +555,11 @@ pub struct TelegramResult<T>
 impl<T> Into<Result<T, ApiError>> for TelegramResult<T> {
     fn into(self) -> Result<T, ApiError> {
         if self.ok {
-            self.result.ok_or(ApiError { error_code: Some(0), description: "empty return".to_string() })
+            let api_error = ApiError {
+                error_code: Some(0),
+                description: "empty return".to_string(),
+            };
+            self.result.ok_or(api_error)
         } else {
             Err(self.into())
         }
