@@ -47,13 +47,23 @@ impl GetUpdates {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Default)]
 pub struct ApiError {
-    error_code: i32,
+    error_code: Option<i32>,
     description: String,
+}
+
+
+impl<T> From<TelegramResult<T>> for ApiError {
+    fn from(result: TelegramResult<T>) -> ApiError {
+        ApiError {
+            error_code: result.err_code,
+            description: result.description.unwrap_or_default(),
+        }
+    }
 }
 
 impl fmt::Display for ApiError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[ERROR {}] {}", self.error_code, self.description)
+        write!(f, "[ERROR] {}", self.description)
     }
 }
 
@@ -428,5 +438,17 @@ pub struct TelegramResult<T>
     pub err_code: Option<i32>,
     pub result: Option<T>,
 }
+
+
+impl<T> Into<Result<T, ApiError>> for TelegramResult<T> {
+    fn into(self) -> Result<T, ApiError> {
+        if self.ok {
+            self.result.ok_or(ApiError { error_code: Some(0), description: "empty return".to_string() })
+        } else {
+            Err(self.into())
+        }
+    }
+}
+
 
 pub type UpdateList = TelegramResult<Vec<types::Update>>;
