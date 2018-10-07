@@ -52,17 +52,6 @@ pub struct ApiError {
     parameters: Option<types::ResponseParameters>,
 }
 
-
-impl<T> From<TelegramResult<T>> for ApiError {
-    fn from(result: TelegramResult<T>) -> ApiError {
-        ApiError {
-            error_code: result.err_code.unwrap_or(0),
-            description: result.description.unwrap_or_default(),
-            parameters: result.parameters,
-        }
-    }
-}
-
 impl fmt::Display for ApiError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[ERROR] {}", self.description)
@@ -560,13 +549,25 @@ impl<T> Into<Result<T, ApiError>> for TelegramResult<T> {
         if self.ok {
             let api_error = ApiError {
                 error_code: 0,
-                description: "The response from telegram `ok: true` but not found `result` field"
-                    .to_string(),
+                description: "In the response from telegram `ok: true`, but not found `result` field.".to_string(),
                 parameters: None,
             };
             self.result.ok_or(api_error)
         } else {
-            Err(self.into())
+            let description = {
+                if self.err_code.is_none() {
+                    "In the response from telegram `ok: false`, but not found `err_code` field.".to_string()
+                } else {
+                    self.description.unwrap_or_default()
+                }
+            };
+            Err(
+                ApiError {
+                    error_code: self.err_code.unwrap_or(0),
+                    description,
+                    parameters: self.parameters
+                }
+            )
         }
     }
 }
