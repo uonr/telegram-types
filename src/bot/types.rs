@@ -124,13 +124,13 @@ pub struct Update {
 #[serde(rename_all = "snake_case")]
 pub enum UpdateContent {
     /// New incoming message of any kind — text, photo, sticker, etc.
-    Message(Box<Message>),
+    Message(Message),
     /// New version of a message that is known to the bot and was edited
-    EditedMessage(Box<Message>),
+    EditedMessage(Message),
     /// New incoming channel post of any kind — text, photo, sticker, etc.
-    ChannelPost(Box<Message>),
+    ChannelPost(Message),
     /// New version of a channel post that is known to the bot and was edited
-    EditChannelPost(Box<Message>),
+    EditChannelPost(Message),
     /// New incoming callback query
     CallbackQuery(CallbackQuery),
 }
