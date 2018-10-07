@@ -577,7 +577,9 @@ pub struct ReplyKeyboardRemove {
     /// 2. if the bot's message is a reply (has reply_to_message_id),
     /// sender of the original message.
     ///
-    /// *Example*: A user votes in a poll, bot returns confirmation message in reply to the vote and removes the keyboard for that user, while still showing the keyboard with poll options to users who haven't voted yet.
+    /// *Example*: A user votes in a poll, bot returns confirmation message in reply to the
+    /// vote and removes the keyboard for that user, while still showing the keyboard with poll
+    /// options to users who haven't voted yet.
     pub selective: Option<bool>,
 }
 
