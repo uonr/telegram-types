@@ -5,7 +5,7 @@ use chrono::naive::NaiveDateTime;
 
 macro_rules! impl_id {
     ($Id: ident : $Ty: ty) => {
-        #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
         pub struct $Id(pub $Ty);
 
         impl ::std::ops::Add<$Ty> for $Id {
