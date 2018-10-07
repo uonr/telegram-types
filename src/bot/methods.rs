@@ -47,16 +47,18 @@ impl GetUpdates {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Default)]
 pub struct ApiError {
-    error_code: Option<i32>,
+    error_code: i32,
     description: String,
+    parameters: Option<types::ResponseParameters>,
 }
 
 
 impl<T> From<TelegramResult<T>> for ApiError {
     fn from(result: TelegramResult<T>) -> ApiError {
         ApiError {
-            error_code: result.err_code,
+            error_code: result.err_code.unwrap_or(0),
             description: result.description.unwrap_or_default(),
+            parameters: result.parameters,
         }
     }
 }
@@ -541,7 +543,7 @@ impl_method!(GetChatAdministrators, "getChatAdministrators", Vec<types::ChatMemb
 impl_method!(GetChatMembersCount  , "getChatMembersCount"  , i32                   );
 impl_method!(GetChatMember        , "getChatMember"        , types::ChatMember     );
 
-
+// https://core.telegram.org/bots/api#making-requests
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TelegramResult<T>
 {
@@ -549,6 +551,7 @@ pub struct TelegramResult<T>
     pub description: Option<String>,
     pub err_code: Option<i32>,
     pub result: Option<T>,
+    pub parameters: Option<types::ResponseParameters>,
 }
 
 
@@ -556,8 +559,10 @@ impl<T> Into<Result<T, ApiError>> for TelegramResult<T> {
     fn into(self) -> Result<T, ApiError> {
         if self.ok {
             let api_error = ApiError {
-                error_code: Some(0),
-                description: "empty return".to_string(),
+                error_code: 0,
+                description: "The response from telegram `ok: true` but not found `result` field"
+                    .to_string(),
+                parameters: None,
             };
             self.result.ok_or(api_error)
         } else {
