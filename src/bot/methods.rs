@@ -4,6 +4,7 @@ use serde::Serialize;
 use std::default::Default;
 use std::error::Error;
 use std::fmt;
+use std::borrow::Cow;
 use super::types;
 use super::types::{ChatId, ForceReply, InlineKeyboardMarkup, MessageId,
                    ParseMode, ReplyKeyboardMarkup, ReplyKeyboardRemove, UpdateId, UserId};
@@ -12,9 +13,9 @@ use super::types::{ChatId, ForceReply, InlineKeyboardMarkup, MessageId,
 /// Chat integer identifier or username
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[serde(untagged)]
-pub enum ChatTarget {
+pub enum ChatTarget<'a> {
     Id(ChatId),
-    Username(String),
+    Username(Cow<'a, str>),
 }
 
 
@@ -72,8 +73,8 @@ impl Error for ApiError {
 /// url, containing a JSON-serialized [`Update`](types::Update). In case of an unsuccessful request, we will give up
 /// after a reasonable amount of attempts. Returns True on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct SetWebhook {
-    pub url: String,
+pub struct SetWebhook<'a> {
+    pub url: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_connections: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -81,16 +82,16 @@ pub struct SetWebhook {
 }
 
 
-impl SetWebhook {
-    pub fn new(url: String) -> SetWebhook {
+impl<'a> SetWebhook<'a> {
+    pub fn new<T: Into<Cow<'a, str>>>(url: T) -> SetWebhook<'a> {
         SetWebhook {
-            url,
+            url: url.into(),
             max_connections: None,
             allowed_updates: None,
         }
     }
 
-    pub fn max_connections(self, x: i32) -> SetWebhook {
+    pub fn max_connections(self, x: i32) -> SetWebhook<'a> {
         SetWebhook { max_connections: Some(x), ..self }
     }
 }
@@ -109,9 +110,9 @@ pub enum ReplyMarkup {
 
 /// Send text messages. On success, the sent [`Message`](types::Message) is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct SendMessage {
-    pub chat_id: ChatTarget,
-    pub text: String,
+pub struct SendMessage<'a> {
+    pub chat_id: ChatTarget<'a>,
+    pub text: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parse_mode: Option<ParseMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -125,11 +126,11 @@ pub struct SendMessage {
 }
 
 
-impl SendMessage {
-    pub fn new(chat_id: ChatTarget, text: String) -> SendMessage {
+impl<'a> SendMessage<'a> {
+    pub fn new<T: Into<Cow<'a, str>>>(chat_id: ChatTarget<'a>, text: T) -> SendMessage<'a> {
         SendMessage {
             chat_id,
-            text,
+            text: text.into(),
             parse_mode: None,
             disable_web_page_preview: Some(false),
             reply_to_message_id: None,
@@ -138,11 +139,11 @@ impl SendMessage {
         }
     }
 
-    pub fn parse_mode(self, mode: ParseMode) -> SendMessage {
+    pub fn parse_mode(self, mode: ParseMode) -> SendMessage<'a> {
         SendMessage { parse_mode: Some(mode), ..self }
     }
 
-    pub fn reply(self, message_id: MessageId) -> SendMessage {
+    pub fn reply(self, message_id: MessageId) -> SendMessage<'a> {
         SendMessage {
             reply_to_message_id: Some(message_id),
             ..self
@@ -165,8 +166,8 @@ pub enum File {
 
 /// Use this method to send .webp stickers.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct SendSticker {
-    pub chat_id: ChatTarget,
+pub struct SendSticker<'a> {
+    pub chat_id: ChatTarget<'a>,
     pub sticker: File,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_notification: Option<bool>,
@@ -177,8 +178,8 @@ pub struct SendSticker {
 }
 
 
-impl SendSticker {
-    pub fn new(chat_id: ChatTarget, sticker: File) -> SendSticker {
+impl<'a> SendSticker<'a> {
+    pub fn new(chat_id: ChatTarget<'a>, sticker: File) -> SendSticker<'a> {
         SendSticker {
             chat_id,
             sticker,
@@ -188,7 +189,7 @@ impl SendSticker {
         }
     }
 
-    pub fn reply(self, reply_to_message_id: MessageId) -> SendSticker {
+    pub fn reply(self, reply_to_message_id: MessageId) -> SendSticker<'a> {
         SendSticker { reply_to_message_id: Some(reply_to_message_id), ..self }
     }
 
@@ -201,11 +202,11 @@ impl SendSticker {
 
 /// Use this method to send photos.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct SendPhoto {
-    pub chat_id: ChatTarget,
+pub struct SendPhoto<'a> {
+    pub chat_id: ChatTarget<'a>,
     pub photo: File,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<String>,
+    pub caption: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parse_mode: Option<ParseMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -217,8 +218,8 @@ pub struct SendPhoto {
 }
 
 
-impl SendPhoto {
-    pub fn new(chat_id: ChatTarget, photo: File) -> SendPhoto {
+impl<'a> SendPhoto<'a> {
+    pub fn new(chat_id: ChatTarget<'a>, photo: File) -> SendPhoto<'a> {
         SendPhoto {
             chat_id,
             photo,
@@ -230,12 +231,12 @@ impl SendPhoto {
         }
     }
 
-    pub fn parse_mode(self, mode: ParseMode) -> SendPhoto {
+    pub fn parse_mode(self, mode: ParseMode) -> SendPhoto<'a> {
         SendPhoto { parse_mode: Some(mode), ..self }
     }
 
 
-    pub fn reply(self, reply_to_message_id: MessageId) -> SendPhoto {
+    pub fn reply(self, reply_to_message_id: MessageId) -> SendPhoto<'a> {
         SendPhoto { reply_to_message_id: Some(reply_to_message_id), ..self }
     }
 
@@ -247,11 +248,11 @@ impl SendPhoto {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct SendDocument {
-    pub chat_id: ChatTarget,
+pub struct SendDocument<'a> {
+    pub chat_id: ChatTarget<'a>,
     pub document: File,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<String>,
+    pub caption: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parse_mode: Option<ParseMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -263,8 +264,8 @@ pub struct SendDocument {
 }
 
 
-impl SendDocument {
-    pub fn new(chat_id: ChatTarget, document: File) -> SendDocument {
+impl<'a> SendDocument<'a> {
+    pub fn new(chat_id: ChatTarget<'a>, document: File) -> SendDocument<'a> {
         SendDocument {
             chat_id,
             document,
@@ -276,11 +277,11 @@ impl SendDocument {
         }
     }
 
-    pub fn parse_mode(self, mode: ParseMode) -> SendDocument {
+    pub fn parse_mode(self, mode: ParseMode) -> SendDocument<'a> {
         SendDocument { parse_mode: Some(mode), ..self }
     }
 
-    pub fn reply(self, reply_to_message_id: MessageId) -> SendDocument {
+    pub fn reply(self, reply_to_message_id: MessageId) -> SendDocument<'a> {
         SendDocument { reply_to_message_id: Some(reply_to_message_id), ..self }
     }
 
@@ -293,9 +294,9 @@ impl SendDocument {
 
 /// Use this method to forward messages of any kind.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct ForwardMessage {
-    pub chat_id: ChatTarget,
-    pub from_chat_id: ChatTarget,
+pub struct ForwardMessage<'a> {
+    pub chat_id: ChatTarget<'a>,
+    pub from_chat_id: ChatTarget<'a>,
     pub message_id: MessageId,
 }
 
@@ -326,14 +327,14 @@ impl GetUserProfilePhotos {
 ///
 /// Returns a [`Chat`] object on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct GetChat {
-    pub chat_id: ChatTarget,
+pub struct GetChat<'a> {
+    pub chat_id: ChatTarget<'a>,
 }
 
 /// Use this method to get the number of members in a chat. Returns `Int` on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct GetChatMembersCount {
-    pub chat_id: ChatTarget,
+pub struct GetChatMembersCount<'a> {
+    pub chat_id: ChatTarget<'a>,
 }
 
 /// Use this method to get a list of administrators in a chat. On success, returns an Array
@@ -341,15 +342,15 @@ pub struct GetChatMembersCount {
 /// other bots. If the chat is a group or a supergroup and no administrators were appointed,
 /// only the creator will be returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct GetChatAdministrators {
-    pub chat_id: ChatTarget,
+pub struct GetChatAdministrators<'a> {
+    pub chat_id: ChatTarget<'a>,
 }
 
 /// Use this method to get information about a member of a chat. Returns a `ChatMember`
 /// object on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct GetChatMember {
-    pub chat_id: ChatTarget,
+pub struct GetChatMember<'a> {
+    pub chat_id: ChatTarget<'a>,
     pub user_id: UserId,
 }
 
@@ -358,14 +359,14 @@ pub struct GetChatMember {
 /// On success, if edited message is sent by the bot, the edited [`Message`](types::Message) is
 /// returned, otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct EditMessageText {
+pub struct EditMessageText<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub chat_id: Option<ChatTarget>,
+    pub chat_id: Option<ChatTarget<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message_id: Option<MessageId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub inline_message_id: Option<String>,
-    pub text: String,
+    pub inline_message_id: Option<Cow<'a, str>>,
+    pub text: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parse_mode: Option<ParseMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -375,24 +376,24 @@ pub struct EditMessageText {
 }
 
 
-impl EditMessageText {
-    pub fn new(chat_id: ChatTarget, message_id: MessageId, text: String) -> EditMessageText {
+impl<'a> EditMessageText<'a> {
+    pub fn new<T: Into<Cow<'a, str>>>(chat_id: ChatTarget<'a>, message_id: MessageId, text: T) -> EditMessageText<'a> {
         EditMessageText {
             chat_id: Some(chat_id),
             message_id: Some(message_id),
             inline_message_id: None,
-            text,
+            text: text.into(),
             parse_mode: None,
             disable_web_page_preview: None,
             reply_markup: None,
         }
     }
 
-    pub fn disable_preview(self) -> EditMessageText {
+    pub fn disable_preview(self) -> EditMessageText<'a> {
         EditMessageText { disable_web_page_preview: Some(true), ..self }
     }
 
-    pub fn parse_mode(self, mode: ParseMode) -> EditMessageText {
+    pub fn parse_mode(self, mode: ParseMode) -> EditMessageText<'a> {
         EditMessageText { parse_mode: Some(mode), ..self }
     }
 
@@ -407,9 +408,9 @@ impl EditMessageText {
 /// On success, if edited message is sent by the bot, the edited [`Message`](types::Message) is
 /// returned, otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct EditMessageCaption {
+pub struct EditMessageCaption<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub chat_id: Option<ChatTarget>,
+    pub chat_id: Option<ChatTarget<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message_id: Option<MessageId>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -423,8 +424,8 @@ pub struct EditMessageCaption {
 }
 
 
-impl EditMessageCaption {
-    pub fn new(chat_id: ChatTarget, message_id: MessageId) -> EditMessageCaption {
+impl<'a> EditMessageCaption<'a> {
+    pub fn new(chat_id: ChatTarget<'a>, message_id: MessageId) -> EditMessageCaption<'a> {
         EditMessageCaption {
             chat_id: Some(chat_id),
             message_id: Some(message_id),
@@ -435,11 +436,11 @@ impl EditMessageCaption {
         }
     }
 
-    pub fn caption(self, caption: String) -> EditMessageCaption {
+    pub fn caption(self, caption: String) -> EditMessageCaption<'a> {
         EditMessageCaption { caption: Some(caption), ..self }
     }
 
-    pub fn parse_mode(self, mode: ParseMode) -> EditMessageCaption {
+    pub fn parse_mode(self, mode: ParseMode) -> EditMessageCaption<'a> {
         EditMessageCaption { parse_mode: Some(mode), ..self }
     }
 
@@ -453,13 +454,13 @@ impl EditMessageCaption {
 /// inline bots). On success, if edited message is sent by the bot, the edited [`Message`](types::Message)
 /// is returned, otherwise True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct EditMessageReplyMarkup {
+pub struct EditMessageReplyMarkup<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub chat_id: Option<ChatTarget>,
+    pub chat_id: Option<ChatTarget<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message_id: Option<MessageId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub inline_message_id: Option<String>,
+    pub inline_message_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_markup: Option<InlineKeyboardMarkup>,
 }
@@ -475,8 +476,8 @@ pub struct EditMessageReplyMarkup {
 ///
 /// Returns True on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct DeleteMessage {
-    pub chat_id: ChatTarget,
+pub struct DeleteMessage<'a> {
+    pub chat_id: ChatTarget<'a>,
     pub message_id: MessageId,
 }
 
@@ -504,6 +505,12 @@ pub trait Method: Serialize {
 }
 
 macro_rules! impl_method {
+    ($Type: ty, $lifetime: lifetime, $name: expr, $Item: ty) => {
+        impl<$lifetime> Method for $Type {
+            const NAME: &'static str = $name;
+            type Item = $Item;
+        }
+    };
     ($Type: ty, $name: expr, $Item: ty) => {
         impl Method for $Type {
             const NAME: &'static str = $name;
@@ -514,23 +521,23 @@ macro_rules! impl_method {
 
 
 //           Type                   Method                   Return
-impl_method!(GetUpdates           , "getUpdates"           , Vec<types::Update>    );
-impl_method!(GetMe                , "getMe"                , types::User           );
-impl_method!(SetWebhook           , "setWebhook"           , bool                  );
-impl_method!(DeleteWebhook        , "deleteWebhook"        , bool                  );
-impl_method!(GetWebhookInfo       , "getWebhookInfo"       , types::WebhookInfo    );
-impl_method!(SendMessage          , "sendMessage"          , types::Message        );
-impl_method!(ForwardMessage       , "forwardMessage"       , types::Message        );
-impl_method!(EditMessageText      , "editMessageText"      , types::Message        );
-impl_method!(DeleteMessage        , "deleteMessage"        , bool                  );
-impl_method!(EditMessageCaption   , "editMessageCaption"   , bool                  );
-impl_method!(SendSticker          , "sendSticker"          , types::Message        );
-impl_method!(SendPhoto            , "sendPhoto"            , types::Message        );
-impl_method!(SendDocument         , "sendDocument"         , types::Message        );
-impl_method!(GetChat              , "getChat"              , types::Chat           );
-impl_method!(GetChatAdministrators, "getChatAdministrators", Vec<types::ChatMember>);
-impl_method!(GetChatMembersCount  , "getChatMembersCount"  , i32                   );
-impl_method!(GetChatMember        , "getChatMember"        , types::ChatMember     );
+impl_method!(GetUpdates                   , "getUpdates"           , Vec<types::Update>    );
+impl_method!(GetMe                        , "getMe"                , types::User           );
+impl_method!(DeleteWebhook                , "deleteWebhook"        , bool                  );
+impl_method!(GetWebhookInfo               , "getWebhookInfo"       , types::WebhookInfo    );
+impl_method!(SetWebhook<'a>           , 'a, "setWebhook"           , bool                  );
+impl_method!(SendMessage<'a>          , 'a, "sendMessage"          , types::Message        );
+impl_method!(ForwardMessage<'a>       , 'a, "forwardMessage"       , types::Message        );
+impl_method!(EditMessageText<'a>      , 'a, "editMessageText"      , types::Message        );
+impl_method!(DeleteMessage<'a>        , 'a, "deleteMessage"        , bool                  );
+impl_method!(EditMessageCaption<'a>   , 'a, "editMessageCaption"   , bool                  );
+impl_method!(SendSticker<'a>          , 'a, "sendSticker"          , types::Message        );
+impl_method!(SendPhoto<'a>            , 'a, "sendPhoto"            , types::Message        );
+impl_method!(SendDocument<'a>         , 'a, "sendDocument"         , types::Message        );
+impl_method!(GetChat<'a>              , 'a, "getChat"              , types::Chat           );
+impl_method!(GetChatAdministrators<'a>, 'a, "getChatAdministrators", Vec<types::ChatMember>);
+impl_method!(GetChatMembersCount<'a>  , 'a, "getChatMembersCount"  , i32                   );
+impl_method!(GetChatMember<'a>        , 'a, "getChatMember"        , types::ChatMember     );
 
 // https://core.telegram.org/bots/api#making-requests
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
