@@ -30,7 +30,7 @@ pub struct GetUpdates {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timeout: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub allowed_updates: Option<Vec<String>>,
+    pub allowed_updates: Option<Vec<UpdateTypes>>,
 }
 
 
@@ -77,7 +77,7 @@ pub struct SetWebhook {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_connections: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub allowed_updates: Option<Vec<String>>,
+    pub allowed_updates: Option<Vec<UpdateTypes>>,
 }
 
 
@@ -574,3 +574,28 @@ impl<T> Into<Result<T, ApiError>> for TelegramResult<T> {
 
 
 pub type UpdateList = TelegramResult<Vec<types::Update>>;
+
+
+/// Types of updates.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[serde(rename_all = "snake_case")]
+pub enum UpdateTypes {
+    /// New incoming message of any kind — text, photo, sticker, etc.
+    Message,
+    /// New version of a message that is known to the bot and was edited
+    EditedMessage,
+    /// New incoming channel post of any kind — text, photo, sticker, etc.
+    ChannelPost,
+    /// New version of a channel post that is known to the bot and was edited
+    EditedChannelPost,
+    /// New incoming inline query
+    InlineQuery,
+    /// The result of an inline query that was chosen by a user and sent to their chat partner.
+    ChosenInlineResult,
+    /// New incoming callback query
+    CallbackQuery,
+    /// New incoming shipping query. Only for invoices with flexible price
+    ShippingQuery,
+    /// New incoming pre-checkout query. Contains full information about checkout
+    PreCheckoutQuery,
+}
