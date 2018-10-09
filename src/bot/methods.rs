@@ -23,7 +23,7 @@ pub enum ChatTarget<'a> {
 /// polling ([wiki](https://en.wikipedia.org/wiki/Push_technology#Long_polling)).
 /// An Array of [`Update`](types::Update) objects is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct GetUpdates {
+pub struct GetUpdates<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<UpdateId>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,12 +31,12 @@ pub struct GetUpdates {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timeout: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub allowed_updates: Option<Vec<UpdateTypes>>,
+    pub allowed_updates: Option<Cow<'a, [UpdateTypes]>>,
 }
 
 
-impl GetUpdates {
-    pub fn new() -> GetUpdates {
+impl<'a> GetUpdates<'a> {
+    pub fn new() -> GetUpdates<'a> {
         Default::default()
     }
 
@@ -78,7 +78,7 @@ pub struct SetWebhook<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_connections: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub allowed_updates: Option<Vec<UpdateTypes>>,
+    pub allowed_updates: Option<Cow<'a, [UpdateTypes]>>,
 }
 
 
@@ -520,11 +520,11 @@ macro_rules! impl_method {
 }
 
 
-//           Type                   Method                   Return
-impl_method!(GetUpdates                   , "getUpdates"           , Vec<types::Update>    );
+//           Type                           Method                   Return
 impl_method!(GetMe                        , "getMe"                , types::User           );
 impl_method!(DeleteWebhook                , "deleteWebhook"        , bool                  );
 impl_method!(GetWebhookInfo               , "getWebhookInfo"       , types::WebhookInfo    );
+impl_method!(GetUpdates<'a>           , 'a, "getUpdates"           , Vec<types::Update>    );
 impl_method!(SetWebhook<'a>           , 'a, "setWebhook"           , bool                  );
 impl_method!(SendMessage<'a>          , 'a, "sendMessage"          , types::Message        );
 impl_method!(ForwardMessage<'a>       , 'a, "forwardMessage"       , types::Message        );
