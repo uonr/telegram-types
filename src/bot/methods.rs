@@ -47,9 +47,9 @@ impl GetUpdates {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Default)]
 pub struct ApiError {
-    error_code: i32,
-    description: String,
-    parameters: Option<types::ResponseParameters>,
+    pub error_code: i32,
+    pub description: String,
+    pub parameters: Option<types::ResponseParameters>,
 }
 
 impl fmt::Display for ApiError {
