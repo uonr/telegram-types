@@ -71,4 +71,9 @@ fn failure() {
     assert!(update.result.is_none());
 }
 
-
+#[test]
+fn send_message() {
+    let id = methods::ChatTarget::id(42);
+    let params = methods::SendMessage::new(id, "hello, world");
+    serde_json::to_string(&params).unwrap();
+}

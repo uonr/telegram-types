@@ -18,6 +18,16 @@ pub enum ChatTarget<'a> {
     Username(Cow<'a, str>),
 }
 
+impl<'a> ChatTarget<'a> {
+    pub fn id(value: i64) -> ChatTarget<'a> {
+        ChatTarget::Id(ChatId(value))
+    }
+
+    pub fn username<T: Into<Cow<'a, str>>>(name: T) -> ChatTarget<'a> {
+        ChatTarget::Username(name.into())
+    }
+}
+
 
 /// Use this method to receive incoming updates using long
 /// polling ([wiki](https://en.wikipedia.org/wiki/Push_technology#Long_polling)).
