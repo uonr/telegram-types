@@ -335,7 +335,7 @@ impl GetUserProfilePhotos {
 /// Use this method to get up to date information about the chat (current name of the user
 /// for one-on-one conversations, current username of a user, group or channel, etc.).
 ///
-/// Returns a [`Chat`] object on success.
+/// Returns a [`Chat`](types::Chat) object on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GetChat<'a> {
     pub chat_id: ChatTarget<'a>,
@@ -501,161 +501,6 @@ pub struct DeleteWebhook;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetWebhookInfo;
 
-/// Use this method to send answers to an inline query.
-///
-/// No more than 50 results per query are allowed.
-#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
-pub struct AnswerInlineQuery<'a> {
-    /// Unique identifier for the answered query
-    pub inline_query_id: Cow<'a, str>,
-    /// A array of results for the inline query
-    pub results: Cow<'a, [InlineQueryResult<'a>]>,
-    /// The maximum amount of time in seconds that the result of the inline query may be cached
-    /// on the server. Defaults to 300.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub cache_time: Option<i32>,
-    /// Pass True, if results may be cached on the server side only for the user that sent
-    /// the query. By default, results may be returned to any user who sends the same query
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_personal: Option<bool>,
-    /// Pass the offset that a client should send in the next query with the same text to
-    /// receive more results. Pass an empty string if there are no more results or if you don‘t
-    /// support pagination. Offset length can’t exceed 64 bytes.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub next_offset: Option<Cow<'a, str>>,
-    /// If passed, clients will display a button with specified text that switches the user to
-    /// a private chat with the bot and sends the bot a start message with the parameter
-    /// switch_pm_parameter
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub switch_pm_text: Option<Cow<'a, str>>,
-    /// Deep-linking parameter for the /start message sent to the bot when user presses the
-    /// switch button. 1-64 characters, only `A-Z`, `a-z`, `0-9`, `_` and `-` are allowed.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub switch_pm_parameter: Option<Cow<'a, str>>,
-}
-
-/// This object represents one result of an inline query.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-#[serde(tag = "type")]
-#[serde(rename_all = "snake_case")]
-pub enum InlineQueryResult<'a> {
-    Article(InlineQueryResultArticle<'a>),
-    // Photo(InlineQueryResultPhoto),
-    // Gif(InlineQueryResultGif),
-    // Mpeg2Gif(InlineQueryResultMpeg4Gif),
-    // Video(InlineQueryResultVideo),
-    // Audio(InlineQueryResultAudio),
-    // Voice(InlineQueryResultVoice),
-    // Document(InlineQueryResultDocument),
-    // Location(InlineQueryResultLocation),
-    // Venue(InlineQueryResultVenue),
-    // Contact(InlineQueryResultContact),
-    // Game(InlineQueryResultGame),
-}
-
-/// Represents a link to an article or web page.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct InlineQueryResultArticle<'a> {
-    /// Unique identifier for this result, 1-64 Bytes
-    pub id: Cow<'a, str>,
-    /// Title of the result
-    pub title: Cow<'a, str>,
-    /// Content of the message to be sent
-    pub input_message_content: InputMessageContent<'a>,
-    /// *Optional*. Inline keyboard attached to the message
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<InlineKeyboardMarkup>,
-    /// *Optional*. URL of the result
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub url: Option<Cow<'a, str>>,
-    /// *Optional*. Pass True, if you don't want the URL to be shown in the message
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub hide_url: Option<bool>,
-    /// *Optional*. Short description of the result
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<Cow<'a, str>>,
-    /// *Optional*. Url of the thumbnail for the result
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub thumb_url: Option<Cow<'a, str>>,
-    /// *Optional*. Thumbnail width
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub thumb_width: Option<i32>,
-    /// *Optional*. Thumbnail height
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub thumb_height: Option<i32>,
-}
-
-/// This object represents the content of a message to be sent as a result of an inline query.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-#[serde(untagged)]
-pub enum InputMessageContent<'a> {
-    Text(InputTextMessageContent<'a>),
-    Location(InputLocationMessageContent),
-    Venue(InputVenueMessageContent<'a>),
-    Contact(InputContactMessageContent<'a>),
-}
-
-/// Represents the content of a text message to be sent as the result of an inline query.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct InputTextMessageContent<'a> {
-    /// Text of the message to be sent, 1-4096 characters
-    pub message_text: Cow<'a, str>,
-    /// *Optional*. Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-    /// fixed-width text or inline URLs in your bot's message.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub parse_mode: Option<ParseMode>,
-    /// *Optional*. Disables link previews for links in the sent message
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub disable_web_page_preview: Option<bool>,
-}
-
-/// Represents the content of a location message to be sent as the result of an inline query.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct InputLocationMessageContent {
-    /// Latitude of the location in degrees
-    pub latitude: f32,
-    /// Longitude of the location in degrees
-    pub longitude: f32,
-    /// *Optional*. Period in seconds for which the location can be updated, should be
-    /// between 60 and 86400.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub live_period: Option<i32>,
-}
-
-/// Represents the content of a venue message to be sent as the result of an inline query.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct InputVenueMessageContent<'a> {
-    /// Latitude of the venue in degrees
-    pub latitude: f32,
-    /// Longitude of the venue in degrees
-    pub longitude: f32,
-    /// Name of the venue
-    pub title: Cow<'a, str>,
-    /// Address of the venue
-    pub address: Cow<'a, str>,
-    /// *Optional*. Foursquare identifier of the venue, if known
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub foursquare_id: Option<Cow<'a, str>>,
-    /// *Optional*. Foursquare type of the venue, if known. (For example,
-    /// “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub foursquare_type: Option<Cow<'a, str>>,
-}
-
-/// Represents the content of a contact message to be sent as the result of an inline query.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct InputContactMessageContent<'a> {
-    /// Contact's phone number
-    pub phone_number: Cow<'a, str>,
-    /// Contact's first name
-    pub first_name: Cow<'a, str>,
-    /// *Optional*. Contact's last name
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub last_name: Option<Cow<'a, str>>,
-    /// *Optional*. Additional data about the contact in the form of a vCard, 0-2048 bytes
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub vcard: Option<Cow<'a, str>>,
-}
 
 /// Telegram methods.
 pub trait Method: Serialize {
@@ -670,15 +515,16 @@ pub trait Method: Serialize {
     }
 }
 
+#[macro_export]
 macro_rules! impl_method {
     ($Type: ty, $lifetime: lifetime, $name: expr, $Item: ty) => {
-        impl<$lifetime> Method for $Type {
+        impl<$lifetime> $crate::bot::methods::Method for $Type {
             const NAME: &'static str = $name;
             type Item = $Item;
         }
     };
     ($Type: ty, $name: expr, $Item: ty) => {
-        impl Method for $Type {
+        impl $crate::bot::methods::Method for $Type {
             const NAME: &'static str = $name;
             type Item = $Item;
         }
@@ -704,7 +550,6 @@ impl_method!(GetChat<'a>              , 'a, "getChat"              , types::Chat
 impl_method!(GetChatAdministrators<'a>, 'a, "getChatAdministrators", Vec<types::ChatMember>);
 impl_method!(GetChatMembersCount<'a>  , 'a, "getChatMembersCount"  , i32                   );
 impl_method!(GetChatMember<'a>        , 'a, "getChatMember"        , types::ChatMember     );
-impl_method!(AnswerInlineQuery<'a>    , 'a, "answerInlineQuery"    , bool                  );
 
 // https://core.telegram.org/bots/api#making-requests
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
