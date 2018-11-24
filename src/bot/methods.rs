@@ -23,7 +23,7 @@ impl<'a> ChatTarget<'a> {
         ChatTarget::Id(ChatId(value))
     }
 
-    pub fn username<T: Into<Cow<'a, str>>>(name: T) -> ChatTarget<'a> {
+    pub fn username(name: impl Into<Cow<'a, str>>) -> ChatTarget<'a> {
         ChatTarget::Username(name.into())
     }
 }
@@ -93,7 +93,7 @@ pub struct SetWebhook<'a> {
 
 
 impl<'a> SetWebhook<'a> {
-    pub fn new<T: Into<Cow<'a, str>>>(url: T) -> SetWebhook<'a> {
+    pub fn new(url: impl Into<Cow<'a, str>>) -> SetWebhook<'a> {
         SetWebhook {
             url: url.into(),
             max_connections: None,
@@ -137,7 +137,7 @@ pub struct SendMessage<'a> {
 
 
 impl<'a> SendMessage<'a> {
-    pub fn new<T: Into<Cow<'a, str>>>(chat_id: ChatTarget<'a>, text: T) -> SendMessage<'a> {
+    pub fn new(chat_id: ChatTarget<'a>, text: impl Into<Cow<'a, str>>) -> SendMessage<'a> {
         SendMessage {
             chat_id,
             text: text.into(),
@@ -387,7 +387,7 @@ pub struct EditMessageText<'a> {
 
 
 impl<'a> EditMessageText<'a> {
-    pub fn new<T: Into<Cow<'a, str>>>(chat_id: ChatTarget<'a>, message_id: MessageId, text: T) -> EditMessageText<'a> {
+    pub fn new(chat_id: ChatTarget<'a>, message_id: MessageId, text: impl Into<Cow<'a, str>>) -> EditMessageText<'a> {
         EditMessageText {
             chat_id: Some(chat_id),
             message_id: Some(message_id),
