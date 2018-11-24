@@ -7,14 +7,12 @@
 //! the placeholder text that the user will see in the input field after typing
 //! your bot’s name.
 
+use bot::types::{InlineKeyboardMarkup, Location, ParseMode, User};
 use std::borrow::Cow;
-use bot::types::{InlineKeyboardMarkup, ParseMode, User, Location};
-
 
 /// Unique identifier for the answered query
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct InlineQueryId(pub String);
-
 
 /// Unique identifier for the result
 ///
@@ -37,7 +35,6 @@ pub struct InlineQuery {
     /// Offset of the results to be returned, can be controlled by the bot
     pub offset: String,
 }
-
 
 /// Use this method to send answers to an inline query.
 ///
@@ -74,7 +71,6 @@ pub struct AnswerInlineQuery<'a> {
 
 impl_method!(AnswerInlineQuery<'a>    , 'a, "answerInlineQuery"    , bool                  );
 
-
 /// One result of an inline query.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "type")]
@@ -104,25 +100,25 @@ pub struct InlineQueryResultArticle<'a> {
     pub title: Cow<'a, str>,
     /// Content of the message to be sent
     pub input_message_content: InputMessageContent<'a>,
-    /// *Optional*. Inline keyboard attached to the message
+    /// Inline keyboard attached to the message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_markup: Option<InlineKeyboardMarkup>,
-    /// *Optional*. URL of the result
+    /// URL of the result
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<Cow<'a, str>>,
-    /// *Optional*. Pass True, if you don't want the URL to be shown in the message
+    /// Pass True, if you don't want the URL to be shown in the message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hide_url: Option<bool>,
-    /// *Optional*. Short description of the result
+    /// Short description of the result
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<Cow<'a, str>>,
-    /// *Optional*. Url of the thumbnail for the result
+    /// Url of the thumbnail for the result
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thumb_url: Option<Cow<'a, str>>,
-    /// *Optional*. Thumbnail width
+    /// Thumbnail width
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thumb_width: Option<i32>,
-    /// *Optional*. Thumbnail height
+    /// Thumbnail height
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thumb_height: Option<i32>,
 }
@@ -142,11 +138,11 @@ pub enum InputMessageContent<'a> {
 pub struct InputTextMessageContent<'a> {
     /// Text of the message to be sent, 1-4096 characters
     pub message_text: Cow<'a, str>,
-    /// *Optional*. Send Markdown or HTML, if you want Telegram apps to show bold, italic,
+    /// Send Markdown or HTML, if you want Telegram apps to show bold, italic,
     /// fixed-width text or inline URLs in your bot's message.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parse_mode: Option<ParseMode>,
-    /// *Optional*. Disables link previews for links in the sent message
+    /// Disables link previews for links in the sent message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_web_page_preview: Option<bool>,
 }
@@ -158,7 +154,7 @@ pub struct InputLocationMessageContent {
     pub latitude: f32,
     /// Longitude of the location in degrees
     pub longitude: f32,
-    /// *Optional*. Period in seconds for which the location can be updated, should be
+    /// Period in seconds for which the location can be updated, should be
     /// between 60 and 86400.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub live_period: Option<i32>,
@@ -175,10 +171,10 @@ pub struct InputVenueMessageContent<'a> {
     pub title: Cow<'a, str>,
     /// Address of the venue
     pub address: Cow<'a, str>,
-    /// *Optional*. Foursquare identifier of the venue, if known
+    /// Foursquare identifier of the venue, if known
     #[serde(skip_serializing_if = "Option::is_none")]
     pub foursquare_id: Option<Cow<'a, str>>,
-    /// *Optional*. Foursquare type of the venue, if known. (For example,
+    /// Foursquare type of the venue, if known. (For example,
     /// “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub foursquare_type: Option<Cow<'a, str>>,
@@ -191,14 +187,13 @@ pub struct InputContactMessageContent<'a> {
     pub phone_number: Cow<'a, str>,
     /// Contact's first name
     pub first_name: Cow<'a, str>,
-    /// *Optional*. Contact's last name
+    /// Contact's last name
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_name: Option<Cow<'a, str>>,
-    /// *Optional*. Additional data about the contact in the form of a vCard, 0-2048 bytes
+    /// Additional data about the contact in the form of a vCard, 0-2048 bytes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vcard: Option<Cow<'a, str>>,
 }
-
 
 /// A result of an inline query that was chosen by the user and sent to their chat partner.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

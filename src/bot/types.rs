@@ -1,12 +1,14 @@
 //! Telegram bot object types.
+use super::inline_mode::InlineQuery;
 use bot::utils::falsum;
 #[cfg(feature = "high")]
 use chrono::naive::NaiveDateTime;
-use super::inline_mode::InlineQuery;
 
 macro_rules! impl_id {
     ($Id: ident : $Ty: ty) => {
-        #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(
+            Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash,
+        )]
         pub struct $Id(pub $Ty);
 
         impl ::std::ops::Add<$Ty> for $Id {
@@ -45,7 +47,6 @@ macro_rules! impl_id {
     };
 }
 
-
 /// Unique identifier for user.
 impl_id! {UserId : i64}
 
@@ -55,7 +56,6 @@ impl_id! {ChatId : i64}
 /// Unique message identifier inside a chat
 impl_id! {MessageId : i64}
 
-
 /// The update‘s unique identifier.
 ///
 /// Update identifiers start from a certain positive number and increase sequentially.
@@ -64,7 +64,6 @@ impl_id! {MessageId : i64}
 /// should they get out of order. If there are no new updates for at least a week,
 /// then identifier of the next update will be chosen randomly instead of sequentially.
 impl_id! {UpdateId : i64}
-
 
 /// Unique identifier for a file
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -78,31 +77,23 @@ pub struct Time(pub u64);
 /// The Datetime.
 #[cfg(feature = "high")]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Time(
-    #[serde(with = "timestamp_format")]
-    pub NaiveDateTime
-);
+pub struct Time(#[serde(with = "timestamp_format")] pub NaiveDateTime);
 
 #[cfg(feature = "high")]
 mod timestamp_format {
     use chrono::naive::NaiveDateTime;
     use serde::{Deserialize, Deserializer, Serializer};
 
-    pub fn serialize<S>(
-        date: &NaiveDateTime,
-        serializer: S,
-    ) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    pub fn serialize<S>(date: &NaiveDateTime, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
     {
         serializer.serialize_i64(date.timestamp())
     }
 
-    pub fn deserialize<'de, D>(
-        deserializer: D,
-    ) -> Result<NaiveDateTime, D::Error>
-        where
-            D: Deserializer<'de>,
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<NaiveDateTime, D::Error>
+    where
+        D: Deserializer<'de>,
     {
         let s = i64::deserialize(deserializer)?;
         Ok(NaiveDateTime::from_timestamp(s, 0))
@@ -159,7 +150,6 @@ pub struct WebhookInfo {
     pub allowed_updates: Option<Vec<String>>,
 }
 
-
 /// A Telegram user or bot.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct User {
@@ -176,7 +166,6 @@ pub struct User {
     /// [IETF language tag](https://en.wikipedia.org/wiki/IETF_language_tag) of the user's language
     pub language_code: Option<String>,
 }
-
 
 /// Type of chat
 #[serde(tag = "type")]
@@ -226,7 +215,6 @@ pub enum ChatType {
     },
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub struct Chat {
     /// Unique identifier for this chat.
@@ -238,7 +226,6 @@ pub struct Chat {
     #[serde(rename = "type")]
     pub kind: ChatType,
 }
-
 
 // TODO: game, video, invoice, successful_payment
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
@@ -348,7 +335,7 @@ pub struct Message {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct MessageEntity {
     /// Type of the entity.
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     pub kind: MessageEntityKind,
     /// Offset in UTF-16 code units to the start of the entity
     pub offset: i32,
@@ -415,7 +402,6 @@ pub struct Audio {
     pub file_size: Option<i32>,
 }
 
-
 /// A voice note.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct Voice {
@@ -450,7 +436,6 @@ pub struct Contact {
     pub user_id: Option<UserId>,
 }
 
-
 /// A file ready to be downloaded.
 /// The file can be downloaded via the link `https://api.telegram.org/file/bot<token>/<file_path>`.
 /// It is guaranteed that the link will be valid for at least 1 hour. When the link expires,
@@ -465,7 +450,6 @@ pub struct File {
     pub file_path: Option<String>,
 }
 
-
 /// A point on the map.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub struct Location {
@@ -474,7 +458,6 @@ pub struct Location {
     /// Latitude as defined by sender
     pub latitude: f32,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub struct Venue {
@@ -487,7 +470,6 @@ pub struct Venue {
     /// Foursquare identifier of the venue
     pub foursquare_id: Option<String>,
 }
-
 
 /// One size of a photo or a [file](Document) / [sticker](Sticker) thumbnail.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -508,7 +490,6 @@ pub struct UserProfilePhotos {
     #[serde(default)]
     pub photos: Vec<PhotoSize>,
 }
-
 
 /// A [custom keyboard](https://core.telegram.org/bots#keyboards)
 /// with reply options (see [Introduction to bots](https://core.telegram.org/bots#keyboards)
@@ -539,7 +520,6 @@ pub struct ReplyKeyboardMarkup {
     pub selective: Option<bool>,
 }
 
-
 /// One button of the reply keyboard.
 /// For simple text buttons *String* can be used instead of this object to specify
 /// text of the button. Optional fields are mutually exclusive.
@@ -559,7 +539,6 @@ pub struct KeyboardButton {
     /// Available in private chats only
     pub request_location: Option<bool>,
 }
-
 
 /// Upon receiving a message with this object, Telegram clients will remove the current
 /// custom keyboard and display the default letter-keyboard.
@@ -595,7 +574,7 @@ pub struct ReplyKeyboardRemove {
 pub struct InlineKeyboardMarkup {
     /// Array of button rows, each represented by an Array of [`InlineKeyboardButton`] objects
     #[serde(default)]
-    pub inline_keyboard: Vec<Vec<InlineKeyboardButton>>
+    pub inline_keyboard: Vec<Vec<InlineKeyboardButton>>,
 }
 
 /// One button of an inline keyboard.
@@ -606,7 +585,6 @@ pub struct InlineKeyboardButton {
     #[serde(flatten)]
     pub pressed: InlineKeyboardButtonPressed,
 }
-
 
 // TODO: callback_game, pay
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -680,7 +658,6 @@ pub struct ForceReply {
     pub selective: Option<bool>,
 }
 
-
 /// Contains information about why a request was unsuccessful.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ResponseParameters {
@@ -690,7 +667,6 @@ pub struct ResponseParameters {
     /// can be repeated
     pub retry_after: Option<i32>,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ChatPhoto {
@@ -816,8 +792,6 @@ pub struct MaskPosition {
     pub scale: f32,
 }
 
-
-
 /// The content of a media message to be sent.
 #[serde(tag = "type")]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
@@ -874,4 +848,3 @@ pub enum ParseMode {
     Markdown,
     HTML,
 }
-

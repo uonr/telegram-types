@@ -1,14 +1,15 @@
 //! Request parameters types of Telegram bot methods.
+use super::types;
+use super::types::{
+    ChatId, ForceReply, InlineKeyboardMarkup, MessageId, ParseMode, ReplyKeyboardMarkup,
+    ReplyKeyboardRemove, UpdateId, UserId,
+};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
+use std::borrow::Cow;
 use std::default::Default;
 use std::error::Error;
 use std::fmt;
-use std::borrow::Cow;
-use super::types;
-use super::types::{ChatId, ForceReply, InlineKeyboardMarkup, MessageId,
-                   ParseMode, ReplyKeyboardMarkup, ReplyKeyboardRemove, UpdateId, UserId};
-
 
 /// Chat integer identifier or username
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -28,7 +29,6 @@ impl<'a> ChatTarget<'a> {
     }
 }
 
-
 /// Use this method to receive incoming updates using long
 /// polling ([wiki](https://en.wikipedia.org/wiki/Push_technology#Long_polling)).
 /// An Array of [`Update`](types::Update) objects is returned.
@@ -44,7 +44,6 @@ pub struct GetUpdates<'a> {
     pub allowed_updates: Option<Cow<'a, [UpdateTypes]>>,
 }
 
-
 impl<'a> GetUpdates<'a> {
     pub fn new() -> GetUpdates<'a> {
         Default::default()
@@ -54,7 +53,6 @@ impl<'a> GetUpdates<'a> {
         self.offset = Some(x)
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Default)]
 pub struct ApiError {
@@ -69,14 +67,11 @@ impl fmt::Display for ApiError {
     }
 }
 
-
 impl Error for ApiError {
     fn description(&self) -> &str {
         self.description.as_ref()
     }
 }
-
-
 
 /// Use this method to specify a url and receive incoming updates via an outgoing webhook.
 /// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified
@@ -91,7 +86,6 @@ pub struct SetWebhook<'a> {
     pub allowed_updates: Option<Cow<'a, [UpdateTypes]>>,
 }
 
-
 impl<'a> SetWebhook<'a> {
     pub fn new<T: Into<Cow<'a, str>>>(url: T) -> SetWebhook<'a> {
         SetWebhook {
@@ -102,10 +96,12 @@ impl<'a> SetWebhook<'a> {
     }
 
     pub fn max_connections(self, x: i32) -> SetWebhook<'a> {
-        SetWebhook { max_connections: Some(x), ..self }
+        SetWebhook {
+            max_connections: Some(x),
+            ..self
+        }
     }
 }
-
 
 /// Kinds of reply markup.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -116,7 +112,6 @@ pub enum ReplyMarkup {
     ReplyKeyboardRemove(ReplyKeyboardRemove),
     ForceReply(ForceReply),
 }
-
 
 /// Send text messages. On success, the sent [`Message`](types::Message) is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -135,7 +130,6 @@ pub struct SendMessage<'a> {
     pub reply_markup: Option<ReplyMarkup>,
 }
 
-
 impl<'a> SendMessage<'a> {
     pub fn new<T: Into<Cow<'a, str>>>(chat_id: ChatTarget<'a>, text: T) -> SendMessage<'a> {
         SendMessage {
@@ -150,7 +144,10 @@ impl<'a> SendMessage<'a> {
     }
 
     pub fn parse_mode(self, mode: ParseMode) -> SendMessage<'a> {
-        SendMessage { parse_mode: Some(mode), ..self }
+        SendMessage {
+            parse_mode: Some(mode),
+            ..self
+        }
     }
 
     pub fn reply(self, message_id: MessageId) -> SendMessage<'a> {
@@ -161,10 +158,12 @@ impl<'a> SendMessage<'a> {
     }
 
     pub fn reply_markup(self, markup: ReplyMarkup) -> Self {
-        Self { reply_markup: Some(markup), ..self }
+        Self {
+            reply_markup: Some(markup),
+            ..self
+        }
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[serde(untagged)]
@@ -172,7 +171,6 @@ pub enum File {
     Id(types::FileId),
     Url(String),
 }
-
 
 /// Use this method to send .webp stickers.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -187,7 +185,6 @@ pub struct SendSticker<'a> {
     pub reply_markup: Option<ReplyMarkup>,
 }
 
-
 impl<'a> SendSticker<'a> {
     pub fn new(chat_id: ChatTarget<'a>, sticker: File) -> SendSticker<'a> {
         SendSticker {
@@ -200,15 +197,19 @@ impl<'a> SendSticker<'a> {
     }
 
     pub fn reply(self, reply_to_message_id: MessageId) -> SendSticker<'a> {
-        SendSticker { reply_to_message_id: Some(reply_to_message_id), ..self }
+        SendSticker {
+            reply_to_message_id: Some(reply_to_message_id),
+            ..self
+        }
     }
-
 
     pub fn reply_markup(self, markup: ReplyMarkup) -> Self {
-        Self { reply_markup: Some(markup), ..self }
+        Self {
+            reply_markup: Some(markup),
+            ..self
+        }
     }
 }
-
 
 /// Use this method to send photos.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -227,7 +228,6 @@ pub struct SendPhoto<'a> {
     pub reply_markup: Option<ReplyMarkup>,
 }
 
-
 impl<'a> SendPhoto<'a> {
     pub fn new(chat_id: ChatTarget<'a>, photo: File) -> SendPhoto<'a> {
         SendPhoto {
@@ -242,20 +242,26 @@ impl<'a> SendPhoto<'a> {
     }
 
     pub fn parse_mode(self, mode: ParseMode) -> SendPhoto<'a> {
-        SendPhoto { parse_mode: Some(mode), ..self }
+        SendPhoto {
+            parse_mode: Some(mode),
+            ..self
+        }
     }
-
 
     pub fn reply(self, reply_to_message_id: MessageId) -> SendPhoto<'a> {
-        SendPhoto { reply_to_message_id: Some(reply_to_message_id), ..self }
+        SendPhoto {
+            reply_to_message_id: Some(reply_to_message_id),
+            ..self
+        }
     }
-
 
     pub fn reply_markup(self, markup: ReplyMarkup) -> Self {
-        Self { reply_markup: Some(markup), ..self }
+        Self {
+            reply_markup: Some(markup),
+            ..self
+        }
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SendDocument<'a> {
@@ -273,7 +279,6 @@ pub struct SendDocument<'a> {
     pub reply_markup: Option<ReplyMarkup>,
 }
 
-
 impl<'a> SendDocument<'a> {
     pub fn new(chat_id: ChatTarget<'a>, document: File) -> SendDocument<'a> {
         SendDocument {
@@ -288,19 +293,26 @@ impl<'a> SendDocument<'a> {
     }
 
     pub fn parse_mode(self, mode: ParseMode) -> SendDocument<'a> {
-        SendDocument { parse_mode: Some(mode), ..self }
+        SendDocument {
+            parse_mode: Some(mode),
+            ..self
+        }
     }
 
     pub fn reply(self, reply_to_message_id: MessageId) -> SendDocument<'a> {
-        SendDocument { reply_to_message_id: Some(reply_to_message_id), ..self }
+        SendDocument {
+            reply_to_message_id: Some(reply_to_message_id),
+            ..self
+        }
     }
-
 
     pub fn reply_markup(self, markup: ReplyMarkup) -> Self {
-        Self { reply_markup: Some(markup), ..self }
+        Self {
+            reply_markup: Some(markup),
+            ..self
+        }
     }
 }
-
 
 /// Use this method to forward messages of any kind.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -320,7 +332,6 @@ pub struct GetUserProfilePhotos {
     pub limit: Option<i32>,
 }
 
-
 impl GetUserProfilePhotos {
     pub fn new(user_id: UserId) -> GetUserProfilePhotos {
         GetUserProfilePhotos {
@@ -330,7 +341,6 @@ impl GetUserProfilePhotos {
         }
     }
 }
-
 
 /// Use this method to get up to date information about the chat (current name of the user
 /// for one-on-one conversations, current username of a user, group or channel, etc.).
@@ -364,7 +374,6 @@ pub struct GetChatMember<'a> {
     pub user_id: UserId,
 }
 
-
 /// Use this method to edit text and game messages sent by the bot or via the bot (for inline bots).
 /// On success, if edited message is sent by the bot, the edited [`Message`](types::Message) is
 /// returned, otherwise True is returned.
@@ -385,9 +394,12 @@ pub struct EditMessageText<'a> {
     pub reply_markup: Option<InlineKeyboardMarkup>,
 }
 
-
 impl<'a> EditMessageText<'a> {
-    pub fn new<T: Into<Cow<'a, str>>>(chat_id: ChatTarget<'a>, message_id: MessageId, text: T) -> EditMessageText<'a> {
+    pub fn new<T: Into<Cow<'a, str>>>(
+        chat_id: ChatTarget<'a>,
+        message_id: MessageId,
+        text: T,
+    ) -> EditMessageText<'a> {
         EditMessageText {
             chat_id: Some(chat_id),
             message_id: Some(message_id),
@@ -400,19 +412,26 @@ impl<'a> EditMessageText<'a> {
     }
 
     pub fn disable_preview(self) -> EditMessageText<'a> {
-        EditMessageText { disable_web_page_preview: Some(true), ..self }
+        EditMessageText {
+            disable_web_page_preview: Some(true),
+            ..self
+        }
     }
 
     pub fn parse_mode(self, mode: ParseMode) -> EditMessageText<'a> {
-        EditMessageText { parse_mode: Some(mode), ..self }
+        EditMessageText {
+            parse_mode: Some(mode),
+            ..self
+        }
     }
 
     pub fn reply_markup(self, markup: InlineKeyboardMarkup) -> Self {
-        Self { reply_markup: Some(markup), ..self }
+        Self {
+            reply_markup: Some(markup),
+            ..self
+        }
     }
 }
-
-
 
 /// Use this method to edit captions of messages sent by the bot or via the bot (for inline bots).
 /// On success, if edited message is sent by the bot, the edited [`Message`](types::Message) is
@@ -433,7 +452,6 @@ pub struct EditMessageCaption<'a> {
     pub reply_markup: Option<InlineKeyboardMarkup>,
 }
 
-
 impl<'a> EditMessageCaption<'a> {
     pub fn new(chat_id: ChatTarget<'a>, message_id: MessageId) -> EditMessageCaption<'a> {
         EditMessageCaption {
@@ -447,18 +465,26 @@ impl<'a> EditMessageCaption<'a> {
     }
 
     pub fn caption(self, caption: String) -> EditMessageCaption<'a> {
-        EditMessageCaption { caption: Some(caption), ..self }
+        EditMessageCaption {
+            caption: Some(caption),
+            ..self
+        }
     }
 
     pub fn parse_mode(self, mode: ParseMode) -> EditMessageCaption<'a> {
-        EditMessageCaption { parse_mode: Some(mode), ..self }
+        EditMessageCaption {
+            parse_mode: Some(mode),
+            ..self
+        }
     }
 
     pub fn reply_markup(self, markup: InlineKeyboardMarkup) -> Self {
-        Self { reply_markup: Some(markup), ..self }
+        Self {
+            reply_markup: Some(markup),
+            ..self
+        }
     }
 }
-
 
 /// Use this method to edit only the reply markup of messages sent by the bot or via the bot (for
 /// inline bots). On success, if edited message is sent by the bot, the edited [`Message`](types::Message)
@@ -475,7 +501,6 @@ pub struct EditMessageReplyMarkup<'a> {
     pub reply_markup: Option<InlineKeyboardMarkup>,
 }
 
-
 /// Use this method to delete a message, including service messages, with the following limitations:
 ///
 /// - A message can only be deleted if it was sent less than 48 hours ago.
@@ -491,7 +516,6 @@ pub struct DeleteMessage<'a> {
     pub message_id: MessageId,
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetMe;
 
@@ -500,7 +524,6 @@ pub struct DeleteWebhook;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetWebhookInfo;
-
 
 /// Telegram methods.
 pub trait Method: Serialize {
@@ -531,11 +554,10 @@ macro_rules! impl_method {
     };
 }
 
-
 //           Type                           Method                   Return
-impl_method!(GetMe                        , "getMe"                , types::User           );
-impl_method!(DeleteWebhook                , "deleteWebhook"        , bool                  );
-impl_method!(GetWebhookInfo               , "getWebhookInfo"       , types::WebhookInfo    );
+impl_method!(GetMe, "getMe", types::User);
+impl_method!(DeleteWebhook, "deleteWebhook", bool);
+impl_method!(GetWebhookInfo, "getWebhookInfo", types::WebhookInfo);
 impl_method!(GetUpdates<'a>           , 'a, "getUpdates"           , Vec<types::Update>    );
 impl_method!(SetWebhook<'a>           , 'a, "setWebhook"           , bool                  );
 impl_method!(SendMessage<'a>          , 'a, "sendMessage"          , types::Message        );
@@ -553,8 +575,7 @@ impl_method!(GetChatMember<'a>        , 'a, "getChatMember"        , types::Chat
 
 // https://core.telegram.org/bots/api#making-requests
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct TelegramResult<T>
-{
+pub struct TelegramResult<T> {
     pub ok: bool,
     pub description: Option<String>,
     pub err_code: Option<i32>,
@@ -562,38 +583,36 @@ pub struct TelegramResult<T>
     pub parameters: Option<types::ResponseParameters>,
 }
 
-
 impl<T> Into<Result<T, ApiError>> for TelegramResult<T> {
     fn into(self) -> Result<T, ApiError> {
         if self.ok {
             let api_error = ApiError {
                 error_code: 0,
-                description: "In the response from telegram `ok: true`, but not found `result` field.".to_string(),
+                description:
+                    "In the response from telegram `ok: true`, but not found `result` field."
+                        .to_string(),
                 parameters: None,
             };
             self.result.ok_or(api_error)
         } else {
             let description = {
                 if self.err_code.is_none() {
-                    "In the response from telegram `ok: false`, but not found `err_code` field.".to_string()
+                    "In the response from telegram `ok: false`, but not found `err_code` field."
+                        .to_string()
                 } else {
                     self.description.unwrap_or_default()
                 }
             };
-            Err(
-                ApiError {
-                    error_code: self.err_code.unwrap_or(0),
-                    description,
-                    parameters: self.parameters
-                }
-            )
+            Err(ApiError {
+                error_code: self.err_code.unwrap_or(0),
+                description,
+                parameters: self.parameters,
+            })
         }
     }
 }
 
-
 pub type UpdateList = TelegramResult<Vec<types::Update>>;
-
 
 /// Types of updates.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
