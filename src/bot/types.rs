@@ -71,12 +71,12 @@ pub struct FileId(pub String);
 
 /// The UNIX timestamp
 #[cfg(not(feature = "high"))]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Time(pub u64);
 
 /// The Datetime.
 #[cfg(feature = "high")]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Time(
     #[serde(with = "timestamp_format")]
     pub NaiveDateTime
@@ -111,7 +111,7 @@ mod timestamp_format {
 /// An incoming update.
 ///
 /// At most one of the optional parameters can be present in any given update.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Update {
     /// The update‘s unique identifier.
     pub update_id: UpdateId,
@@ -120,7 +120,7 @@ pub struct Update {
 }
 
 // TODO: chosen_inline_result, shipping_query, pre_checkout_query
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum UpdateContent {
     /// New incoming message of any kind — text, photo, sticker, etc.
@@ -138,7 +138,7 @@ pub enum UpdateContent {
 }
 
 /// Contains information about the current status of a webhook.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct WebhookInfo {
     /// Webhook URL, may be empty if webhook is not set up
     pub url: String,
@@ -160,7 +160,7 @@ pub struct WebhookInfo {
 
 
 /// A Telegram user or bot.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct User {
     /// Unique identifier for this user or bot
     pub id: UserId,
@@ -180,7 +180,7 @@ pub struct User {
 /// Type of chat
 #[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum ChatType {
     Private {
         username: Option<String>,
@@ -226,7 +226,7 @@ pub enum ChatType {
 }
 
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Chat {
     /// Unique identifier for this chat.
     pub id: ChatId,
@@ -240,7 +240,7 @@ pub struct Chat {
 
 
 // TODO: game, video, invoice, successful_payment
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Message {
     /// Unique message identifier inside this chat
     pub message_id: MessageId,
@@ -344,7 +344,7 @@ pub struct Message {
 
 /// One special entity in a text message.
 /// For example, hashtags, usernames, URLs, etc.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct MessageEntity {
     /// Type of the entity.
     #[serde(rename="type")]
@@ -360,7 +360,7 @@ pub struct MessageEntity {
 }
 
 /// Type of the `MessageEntity`.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(rename_all = "snake_case")]
 pub enum MessageEntityKind {
     /// `@username`
@@ -385,7 +385,7 @@ pub enum MessageEntityKind {
 
 /// A general file (as opposed to [photos](PhotoSize), [voice messages](Voice) and
 /// [audio files](Audio)).
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Hash, Eq)]
 pub struct Document {
     /// Unique file identifier
     pub file_id: FileId,
@@ -399,7 +399,7 @@ pub struct Document {
 }
 
 /// An audio file to be treated as music by the Telegram clients.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Hash, Eq)]
 pub struct Audio {
     /// Unique identifier for this file
     pub file_id: FileId,
@@ -428,7 +428,7 @@ pub struct Voice {
 }
 
 /// A video message (available in Telegram apps as of v.4.0).
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct VideoNote {
     /// Unique identifier for this file
     pub file_id: FileId,
@@ -441,7 +441,7 @@ pub struct VideoNote {
 }
 
 /// A phone contact.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Contact {
     pub phone_number: String,
     pub first_name: String,
@@ -454,7 +454,7 @@ pub struct Contact {
 /// The file can be downloaded via the link `https://api.telegram.org/file/bot<token>/<file_path>`.
 /// It is guaranteed that the link will be valid for at least 1 hour. When the link expires,
 /// a new one can be requested by calling `getFile`.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Hash)]
 pub struct File {
     /// Unique identifier for this file
     pub file_id: FileId,
@@ -489,7 +489,7 @@ pub struct Venue {
 
 
 /// One size of a photo or a [file](Document) / [sticker](Sticker) thumbnail.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PhotoSize {
     /// Unique identifier for this file
     pub file_id: FileId,
@@ -499,7 +499,7 @@ pub struct PhotoSize {
 }
 
 /// A user's profile pictures.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct UserProfilePhotos {
     /// Total number of profile pictures the target user has
     pub total_count: i32,
@@ -512,7 +512,7 @@ pub struct UserProfilePhotos {
 /// A [custom keyboard](https://core.telegram.org/bots#keyboards)
 /// with reply options (see [Introduction to bots](https://core.telegram.org/bots#keyboards)
 /// for details and examples).
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ReplyKeyboardMarkup {
     /// Array of button rows, each represented by an Array of [`KeyboardButton`](KeyboardButton) objects
     #[serde(default)]
@@ -546,7 +546,7 @@ pub struct ReplyKeyboardMarkup {
 /// ## Note
 /// Note: request_contact and request_location options will only work in
 /// Telegram versions released after 9 April, 2016. Older clients will ignore them.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct KeyboardButton {
     /// Text of the button. If none of the optional fields are used,
     /// it will be sent as a message when the button is pressed
@@ -566,7 +566,7 @@ pub struct KeyboardButton {
 /// By default, custom keyboards are displayed until a new keyboard is sent by a bot.
 /// An exception is made for one-time keyboards that are hidden immediately after the user
 /// presses a button (see [`ReplyKeyboardMarkup`]).
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ReplyKeyboardRemove {
     /// Requests clients to remove the custom keyboard (user will not be able to summon this
     /// keyboard; if you want to hide the keyboard from sight but keep it accessible,
@@ -590,7 +590,7 @@ pub struct ReplyKeyboardRemove {
 /// ## Note
 /// This will only work in Telegram versions released after 9 April, 2016.
 /// Older clients will display unsupported message.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct InlineKeyboardMarkup {
     /// Array of button rows, each represented by an Array of [`InlineKeyboardButton`] objects
     #[serde(default)]
@@ -598,7 +598,7 @@ pub struct InlineKeyboardMarkup {
 }
 
 /// One button of an inline keyboard.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct InlineKeyboardButton {
     /// Label text on the button
     pub text: String,
@@ -608,7 +608,7 @@ pub struct InlineKeyboardButton {
 
 
 // TODO: callback_game, pay
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum InlineKeyboardButtonPressed {
     /// HTTP url to be opened when button is pressed
@@ -642,7 +642,7 @@ pub enum InlineKeyboardButtonPressed {
 /// you call `answerCallbackQuery`. It is, therefore, necessary to react by calling
 /// `answerCallbackQuery` even if no notification to the user is needed (e.g., without
 /// specifying any of the optional parameters).
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct CallbackQuery {
     /// Unique identifier for this query
     pub id: String,
@@ -666,7 +666,7 @@ pub struct CallbackQuery {
 /// to the user (act as if the user has selected the bot‘s message and tapped ’Reply'). This can
 /// be extremely useful if you want to create user-friendly step-by-step interfaces without having
 /// to sacrifice [privacy mode](https://core.telegram.org/bots#privacy-mode).
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ForceReply {
     /// Shows reply interface to the user, as if they manually selected the bot‘s message and
     /// tapped ’Reply'
@@ -681,7 +681,7 @@ pub struct ForceReply {
 
 
 /// Contains information about why a request was unsuccessful.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ResponseParameters {
     /// *Optional*. The group has been migrated to a supergroup with the specified identifier.
     pub migrate_to_chat_id: Option<ChatId>,
@@ -691,7 +691,7 @@ pub struct ResponseParameters {
 }
 
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ChatPhoto {
     /// Unique file identifier of small (160x160) chat photo.
     /// This file_id can be used only for photo download.
@@ -702,7 +702,7 @@ pub struct ChatPhoto {
 }
 
 /// This object contains information about one member of a chat.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ChatMember {
     /// Information about the user
     pub user: Box<User>,
@@ -748,7 +748,7 @@ pub struct ChatMember {
 
 /// The member's status in the chat.
 #[serde(rename_all = "lowercase")]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ChatMemberStatus {
     Creator,
     Administrator,
@@ -769,7 +769,7 @@ pub enum ChatMemberStatus {
 //
 //}
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Sticker {
     pub file_id: FileId,
     pub width: i32,
@@ -786,7 +786,7 @@ pub struct Sticker {
 }
 
 /// A sticker set.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct StickerSet {
     /// Sticker set name
     pub name: String,
@@ -800,7 +800,7 @@ pub struct StickerSet {
 }
 
 /// The position on faces where a mask should be placed by default.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct MaskPosition {
     /// The part of the face relative to which the mask should be placed. One of “forehead”, “eyes”,
     /// “mouth”, or “chin”.
@@ -819,7 +819,7 @@ pub struct MaskPosition {
 
 /// The content of a media message to be sent.
 #[serde(tag = "type")]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd, Hash, Eq, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum InputMedia {
     #[serde(rename = "video")]
     Video {
@@ -868,14 +868,14 @@ pub enum InputMedia {
 /// Send *Markdown or HTML*, if you want Telegram apps to show
 /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options)
 /// in the media caption.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum ParseMode {
     Markdown,
     HTML,
 }
 
 /// This object represents an incoming inline query.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct InlineQuery {
     /// Unique identifier for this query
     pub id: String,
