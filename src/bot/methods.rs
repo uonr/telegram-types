@@ -149,6 +149,10 @@ impl<'a> SendMessage<'a> {
         }
     }
 
+    pub fn disable_preview(self) -> SendMessage<'a> {
+        SendMessage { disable_web_page_preview: Some(true), ..self }
+    }
+
     pub fn parse_mode(self, mode: ParseMode) -> SendMessage<'a> {
         SendMessage { parse_mode: Some(mode), ..self }
     }
