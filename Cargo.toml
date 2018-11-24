@@ -14,7 +14,7 @@ travis-ci = { repository = "quanbrew/telegram-types", branch = "master" }
 high = ["chrono"]
 
 [dependencies]
-serde = "1.0"
-serde_derive = "1.0"
-serde_json = "1.0"
+serde = "^1.0"
+serde_derive = "^1.0"
+serde_json = "^1.0"
 chrono = { version = "0.4", features = ["serde"], optional = true }
