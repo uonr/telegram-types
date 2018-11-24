@@ -119,7 +119,7 @@ pub struct Update {
     pub content: UpdateContent,
 }
 
-// TODO: inline_query, chosen_inline_result, shipping_query, pre_checkout_query
+// TODO: chosen_inline_result, shipping_query, pre_checkout_query
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 #[serde(rename_all = "snake_case")]
 pub enum UpdateContent {
@@ -133,6 +133,8 @@ pub enum UpdateContent {
     EditChannelPost(Message),
     /// New incoming callback query
     CallbackQuery(CallbackQuery),
+    /// New incoming inline query
+    InlineQuery(InlineQuery),
 }
 
 /// Contains information about the current status of a webhook.
@@ -870,4 +872,19 @@ pub enum InputMedia {
 pub enum ParseMode {
     Markdown,
     HTML,
+}
+
+/// This object represents an incoming inline query.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+pub struct InlineQuery {
+    /// Unique identifier for this query
+    pub id: String,
+    /// Sender
+    pub from: Box<User>,
+    /// *Optional*. Sender location, only for bots that request user location
+    pub location: Option<Box<Location>>,
+    /// Text of the query (up to 512 characters)
+    pub query: String,
+    /// Offset of the results to be returned, can be controlled by the bot
+    pub offset: String,
 }
