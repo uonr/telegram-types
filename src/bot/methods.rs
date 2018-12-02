@@ -578,7 +578,7 @@ impl_method!(GetChatMember<'a>        , 'a, "getChatMember"        , types::Chat
 pub struct TelegramResult<T> {
     pub ok: bool,
     pub description: Option<String>,
-    pub err_code: Option<i32>,
+    pub error_code: Option<i32>,
     pub result: Option<T>,
     pub parameters: Option<types::ResponseParameters>,
 }
@@ -596,7 +596,7 @@ impl<T> Into<Result<T, ApiError>> for TelegramResult<T> {
             self.result.ok_or(api_error)
         } else {
             let description = {
-                if self.err_code.is_none() {
+                if self.error_code.is_none() {
                     "In the response from telegram `ok: false`, but not found `err_code` field."
                         .to_string()
                 } else {
@@ -604,7 +604,7 @@ impl<T> Into<Result<T, ApiError>> for TelegramResult<T> {
                 }
             };
             Err(ApiError {
-                error_code: self.err_code.unwrap_or(0),
+                error_code: self.error_code.unwrap_or(0),
                 description,
                 parameters: self.parameters,
             })
