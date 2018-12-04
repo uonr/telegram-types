@@ -21,7 +21,7 @@ pub struct InlineQueryId(pub String);
 pub struct ResultId(pub String);
 
 /// An incoming inline query.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct InlineQuery {
     /// Unique identifier for this query
     pub id: InlineQueryId,
