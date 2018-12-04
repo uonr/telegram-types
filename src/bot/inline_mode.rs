@@ -39,7 +39,7 @@ pub struct InlineQuery {
 /// Use this method to send answers to an inline query.
 ///
 /// No more than 50 results per query are allowed.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Builder)]
 pub struct AnswerInlineQuery<'a> {
     /// Unique identifier for the answered query
     pub inline_query_id: InlineQueryId,
@@ -69,7 +69,7 @@ pub struct AnswerInlineQuery<'a> {
     pub switch_pm_parameter: Option<Cow<'a, str>>,
 }
 
-impl_method!(AnswerInlineQuery<'a>    , 'a, "answerInlineQuery"    , bool                  );
+impl_method!(AnswerInlineQuery<'a>, 'a, "answerInlineQuery", bool);
 
 /// One result of an inline query.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

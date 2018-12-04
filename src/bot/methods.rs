@@ -32,7 +32,7 @@ impl<'a> ChatTarget<'a> {
 /// Use this method to receive incoming updates using long
 /// polling ([wiki](https://en.wikipedia.org/wiki/Push_technology#Long_polling)).
 /// An Array of [`Update`](types::Update) objects is returned.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, Builder)]
 pub struct GetUpdates<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<UpdateId>,
@@ -54,8 +54,7 @@ impl<'a> GetUpdates<'a> {
     }
 }
 
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default, Builder)]
 pub struct ApiError {
     pub error_code: i32,
     pub description: String,
@@ -78,7 +77,7 @@ impl Error for ApiError {
 /// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified
 /// url, containing a JSON-serialized [`Update`](types::Update). In case of an unsuccessful request, we will give up
 /// after a reasonable amount of attempts. Returns True on success.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct SetWebhook<'a> {
     pub url: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -115,7 +114,7 @@ pub enum ReplyMarkup {
 }
 
 /// Send text messages. On success, the sent [`Message`](types::Message) is returned.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct SendMessage<'a> {
     pub chat_id: ChatTarget<'a>,
     pub text: Cow<'a, str>,
@@ -174,7 +173,7 @@ pub enum File {
 }
 
 /// Use this method to send .webp stickers.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct SendSticker<'a> {
     pub chat_id: ChatTarget<'a>,
     pub sticker: File,
@@ -213,7 +212,7 @@ impl<'a> SendSticker<'a> {
 }
 
 /// Use this method to send photos.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct SendPhoto<'a> {
     pub chat_id: ChatTarget<'a>,
     pub photo: File,
@@ -264,7 +263,7 @@ impl<'a> SendPhoto<'a> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct SendDocument<'a> {
     pub chat_id: ChatTarget<'a>,
     pub document: File,
@@ -316,7 +315,7 @@ impl<'a> SendDocument<'a> {
 }
 
 /// Use this method to forward messages of any kind.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct ForwardMessage<'a> {
     pub chat_id: ChatTarget<'a>,
     pub from_chat_id: ChatTarget<'a>,
@@ -324,7 +323,7 @@ pub struct ForwardMessage<'a> {
 }
 
 /// To get a list of profile pictures for a user. Returns a [`UserProfilePhotos`](types::UserProfilePhotos) object.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct GetUserProfilePhotos {
     pub user_id: UserId,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -347,13 +346,13 @@ impl GetUserProfilePhotos {
 /// for one-on-one conversations, current username of a user, group or channel, etc.).
 ///
 /// Returns a [`Chat`](types::Chat) object on success.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct GetChat<'a> {
     pub chat_id: ChatTarget<'a>,
 }
 
 /// Use this method to get the number of members in a chat. Returns `Int` on success.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct GetChatMembersCount<'a> {
     pub chat_id: ChatTarget<'a>,
 }
@@ -362,14 +361,14 @@ pub struct GetChatMembersCount<'a> {
 /// of `ChatMember` objects that contains information about all chat administrators except
 /// other bots. If the chat is a group or a supergroup and no administrators were appointed,
 /// only the creator will be returned.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct GetChatAdministrators<'a> {
     pub chat_id: ChatTarget<'a>,
 }
 
 /// Use this method to get information about a member of a chat. Returns a `ChatMember`
 /// object on success.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct GetChatMember<'a> {
     pub chat_id: ChatTarget<'a>,
     pub user_id: UserId,
@@ -378,7 +377,7 @@ pub struct GetChatMember<'a> {
 /// Use this method to edit text and game messages sent by the bot or via the bot (for inline bots).
 /// On success, if edited message is sent by the bot, the edited [`Message`](types::Message) is
 /// returned, otherwise True is returned.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, Builder)]
 pub struct EditMessageText<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub chat_id: Option<ChatTarget<'a>>,
@@ -437,7 +436,7 @@ impl<'a> EditMessageText<'a> {
 /// Use this method to edit captions of messages sent by the bot or via the bot (for inline bots).
 /// On success, if edited message is sent by the bot, the edited [`Message`](types::Message) is
 /// returned, otherwise True is returned.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, Builder)]
 pub struct EditMessageCaption<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub chat_id: Option<ChatTarget<'a>>,
@@ -490,7 +489,7 @@ impl<'a> EditMessageCaption<'a> {
 /// Use this method to edit only the reply markup of messages sent by the bot or via the bot (for
 /// inline bots). On success, if edited message is sent by the bot, the edited [`Message`](types::Message)
 /// is returned, otherwise True is returned.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, Builder)]
 pub struct EditMessageReplyMarkup<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub chat_id: Option<ChatTarget<'a>>,
@@ -511,7 +510,7 @@ pub struct EditMessageReplyMarkup<'a> {
 /// - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
 ///
 /// Returns True on success.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Builder)]
 pub struct DeleteMessage<'a> {
     pub chat_id: ChatTarget<'a>,
     pub message_id: MessageId,
