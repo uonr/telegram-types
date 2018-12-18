@@ -556,9 +556,9 @@ macro_rules! impl_method {
 }
 
 //           Type                           Method                   Return
-impl_method!(GetMe                        , "getMe"                , types::User           );
-impl_method!(DeleteWebhook                , "deleteWebhook"        , bool                  );
-impl_method!(GetWebhookInfo               , "getWebhookInfo"       , types::WebhookInfo    );
+impl_method!(GetMe, "getMe", types::User);
+impl_method!(DeleteWebhook, "deleteWebhook", bool);
+impl_method!(GetWebhookInfo, "getWebhookInfo", types::WebhookInfo);
 impl_method!(GetUpdates<'a>           , 'a, "getUpdates"           , Vec<types::Update>    );
 impl_method!(SetWebhook<'a>           , 'a, "setWebhook"           , bool                  );
 impl_method!(SendMessage<'a>          , 'a, "sendMessage"          , types::Message        );
