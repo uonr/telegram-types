@@ -125,6 +125,9 @@ pub enum UpdateContent {
     CallbackQuery(CallbackQuery),
     /// New incoming inline query
     InlineQuery(InlineQuery),
+    #[serde(other)]
+    /// Unknown upstream data type.
+    Unknown,
 }
 
 /// Contains information about the current status of a webhook.
@@ -211,6 +214,9 @@ pub enum ChatType {
         /// Description. Returned only in `getChat`.
         description: Option<String>,
     },
+    #[serde(other)]
+    /// Unknown upstream data type.
+    Unknown,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -369,6 +375,9 @@ pub enum MessageEntityKind {
     TextLink,
     /// for users without usernames
     TextMention,
+    #[serde(other)]
+    /// Unknown upstream data type.
+    Unknown,
 }
 
 /// A general file (as opposed to [photos](PhotoSize), [voice messages](Voice) and
@@ -608,6 +617,9 @@ pub enum InlineKeyboardButtonPressed {
     /// the chat selection screen.
     SwitchInlineQuery(String),
     SwitchInlineQueryCurrentChat(String),
+    #[serde(other)]
+    /// Unknown upstream data type.
+    Unknown,
 }
 
 /// This object represents an incoming callback query from a callback button in an inline keyboard.
@@ -667,7 +679,6 @@ pub struct ResponseParameters {
     /// can be repeated
     pub retry_after: Option<i32>,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ChatPhoto {
@@ -734,6 +745,9 @@ pub enum ChatMemberStatus {
     Restricted,
     Left,
     Kicked,
+    #[serde(other)]
+    /// Unknown upstream data type.
+    Unknown,
 }
 
 /////
@@ -839,6 +853,9 @@ pub enum InputMedia {
         /// in the media caption.
         parse_mode: Option<ParseMode>,
     },
+    #[serde(other)]
+    /// Unknown upstream data type.
+    Unknown,
 }
 
 /// Send *Markdown or HTML*, if you want Telegram apps to show
@@ -848,4 +865,7 @@ pub enum InputMedia {
 pub enum ParseMode {
     Markdown,
     HTML,
+    #[serde(other)]
+    /// Unknown upstream data type.
+    Unknown,
 }

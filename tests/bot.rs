@@ -73,3 +73,15 @@ fn send_message() {
     let params = methods::SendMessage::new(id, "hello, world");
     serde_json::to_string(&params).unwrap();
 }
+
+#[test]
+fn unknown() {
+    use serde_json::from_str;
+    use types::{ChatType, MessageEntityKind};
+    let raw = "\"Flip Flappers\"";
+    let message_entity_type = from_str::<MessageEntityKind>(raw).unwrap();
+    assert_eq!(message_entity_type, MessageEntityKind::Unknown);
+    let raw = r#"{"type": "Papika", "Cocona": "Mimi"}"#;
+    let chat_type = from_str::<ChatType>(raw).unwrap();
+    assert_eq!(chat_type, ChatType::Unknown);
+}
