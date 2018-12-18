@@ -352,9 +352,11 @@ pub enum MessageEntityKind {
     /// `@username`
     Mention,
     Hashtag,
+    Cashtag,
     BotCommand,
     Url,
     Email,
+    PhoneNumber,
     /// bold text
     Bold,
     /// italic text
