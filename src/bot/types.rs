@@ -109,7 +109,6 @@ pub struct Update {
     pub content: UpdateContent,
 }
 
-// TODO: chosen_inline_result, shipping_query, pre_checkout_query
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum UpdateContent {
@@ -120,11 +119,18 @@ pub enum UpdateContent {
     /// New incoming channel post of any kind — text, photo, sticker, etc.
     ChannelPost(Message),
     /// New version of a channel post that is known to the bot and was edited
-    EditChannelPost(Message),
+    EditedChannelPost(Message),
     /// New incoming callback query
     CallbackQuery(CallbackQuery),
     /// New incoming inline query
     InlineQuery(InlineQuery),
+    // TODO: implement these placeholders
+    #[doc(hidden)]
+    ChosenInlineResult(()),
+    #[doc(hidden)]
+    ShippingQuery(()),
+    #[doc(hidden)]
+    PreCheckoutQuery(()),
     #[serde(other)]
     /// Unknown upstream data type.
     Unknown,
@@ -231,7 +237,7 @@ pub struct Chat {
     pub kind: ChatType,
 }
 
-// TODO: game, video, invoice, successful_payment
+// TODO: game, invoice, successful_payment
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Message {
     /// Unique message identifier inside this chat
@@ -278,8 +284,14 @@ pub struct Message {
     pub entities: Vec<MessageEntity>,
     /// Message is a voice message, information about the file
     pub voice: Option<Box<Voice>>,
+    /// Message is a video, information about the video
+    pub video: Option<Video>,
     /// Message is a video note, information about the video message
     pub video_note: Option<Box<VideoNote>>,
+    /// Message is an animation, information about the animation.
+    ///
+    /// For backward compatibility, when this field is set, the document field will also be set
+    pub animation: Option<Box<Animation>>,
     /// For messages with a caption, special entities like usernames, URLs, bot commands, etc.
     /// that appear in the caption
     #[serde(default)]
@@ -395,6 +407,44 @@ pub struct Document {
     pub file_size: Option<i32>,
 }
 
+
+/// A video file.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Hash, Eq)]
+pub struct Video {
+    /// Unique identifier for this file
+    pub file_id: FileId,
+    pub width: i32,
+    pub height: i32,
+    /// Duration of the video in seconds as defined by sender
+    pub duration: i32,
+    /// Video thumbnail
+    pub thumb: Option<PhotoSize>,
+    /// Mime type of a file as defined by sender
+    pub mime_type: Option<String>,
+    /// File size
+    pub file_size: Option<i32>,
+}
+
+/// An animation file (GIF or H.264/MPEG-4 AVC video without sound).
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Hash, Eq)]
+pub struct Animation {
+    /// Unique identifier for this file
+    pub file_id: FileId,
+    pub width: i32,
+    pub height: i32,
+    /// Duration of the video in seconds as defined by sender
+    pub duration: i32,
+    /// Video thumbnail
+    pub thumb: Option<PhotoSize>,
+    /// Original animation filename as defined by sender
+    pub file_name: Option<String>,
+    /// Mime type of a file as defined by sender
+    pub mime_type: Option<String>,
+    /// File size
+    pub file_size: Option<i32>,
+}
+
+
 /// An audio file to be treated as music by the Telegram clients.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Hash, Eq)]
 pub struct Audio {
@@ -443,6 +493,8 @@ pub struct Contact {
     pub first_name: String,
     pub last_name: Option<String>,
     pub user_id: Option<UserId>,
+    /// Additional data about the contact in the form of a vCard
+    pub vcard: Option<String>,
 }
 
 /// A file ready to be downloaded.
@@ -595,7 +647,6 @@ pub struct InlineKeyboardButton {
     pub pressed: InlineKeyboardButtonPressed,
 }
 
-// TODO: callback_game, pay
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum InlineKeyboardButtonPressed {
@@ -617,6 +668,13 @@ pub enum InlineKeyboardButtonPressed {
     /// the chat selection screen.
     SwitchInlineQuery(String),
     SwitchInlineQueryCurrentChat(String),
+    /// Description of the game that will be launched when the user presses the button.
+    ///
+    /// # NOTE
+    /// This type of button **must** always be the first button in the first row.
+    Pay(bool),
+    #[doc(hidden)]
+    CallbackGame(()), // TODO: implement `CallbackGame`.
     #[serde(other)]
     /// Unknown upstream data type.
     Unknown,
@@ -750,16 +808,12 @@ pub enum ChatMemberStatus {
     Unknown,
 }
 
-/////
+// TODO: InputFile
 //#[derive(Serialize, Deserialize,  Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 //pub struct InputFile {
 //
 //}
-/////
-//#[derive(Serialize, Deserialize,  Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-//pub struct InputMedia {
-//
-//}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Sticker {
@@ -807,6 +861,8 @@ pub struct MaskPosition {
     pub scale: f32,
 }
 
+
+// TODO: url and attach methods.
 /// The content of a media message to be sent.
 #[serde(tag = "type")]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -822,7 +878,6 @@ pub enum InputMedia {
         ///
         /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
         media: FileId,
-        // TODO: url and attach
         /// *Optional*. Caption of the photo to be sent, 0-200 characters
         caption: Option<String>,
         /// *Optional*. Send Markdown or HTML, if you want Telegram apps to show
@@ -852,6 +907,35 @@ pub enum InputMedia {
         /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options)
         /// in the media caption.
         parse_mode: Option<ParseMode>,
+    },
+    #[serde(rename = "animation")]
+    Animation {
+        /// File to send.
+        ///
+        /// Pass a file_id to send a file that exists on the Telegram servers (recommended),
+        /// pass an HTTP URL for Telegram to get a file from the Internet, or pass
+        /// "attach://<file_attach_name>" to upload a new one using multipart/form-data
+        /// under <file_attach_name> name.
+        ///
+        /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
+        media: FileId,
+        /// Thumbnail of the file sent.
+        ///
+        /// The thumbnail should be in JPEG format and less than 200 kB in size.
+        ///
+        /// A thumbnail‘s width and height should not exceed 90.
+        ///
+        /// Ignored if the file is not uploaded using multipart/form-data.
+        ///
+        /// Thumbnails can’t be reused and can be only uploaded as a new file,
+        /// so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded
+        /// using multipart/form-data under <file_attach_name>.
+        thumb: Option<String>,
+        caption: Option<String>,
+        parse_mode: Option<ParseMode>,
+        width: Option<i32>,
+        height: Option<i32>,
+        duration: Option<i32>,
     },
     #[serde(other)]
     /// Unknown upstream data type.

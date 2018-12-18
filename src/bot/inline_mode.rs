@@ -77,18 +77,29 @@ impl_method!(AnswerInlineQuery<'a>    , 'a, "answerInlineQuery"    , bool       
 #[serde(rename_all = "snake_case")]
 pub enum InlineQueryResult<'a> {
     Article(InlineQueryResultArticle<'a>),
-    // TODO:
-    // Photo(InlineQueryResultPhoto),
-    // Gif(InlineQueryResultGif),
-    // Mpeg2Gif(InlineQueryResultMpeg4Gif),
-    // Video(InlineQueryResultVideo),
-    // Audio(InlineQueryResultAudio),
-    // Voice(InlineQueryResultVoice),
-    // Document(InlineQueryResultDocument),
-    // Location(InlineQueryResultLocation),
-    // Venue(InlineQueryResultVenue),
-    // Contact(InlineQueryResultContact),
-    // Game(InlineQueryResultGame),
+    // TODO: implement these placeholders
+    #[doc(hidden)]
+    Photo(()), // InlineQueryResultPhoto
+    #[doc(hidden)]
+    Gif(()), // InlineQueryResultGif
+    #[doc(hidden)]
+    Mpeg2Gif(()), // InlineQueryResultMpeg4Gif
+    #[doc(hidden)]
+    Video(()), // InlineQueryResultVideo
+    #[doc(hidden)]
+    Audio(()), // InlineQueryResultAudio
+    #[doc(hidden)]
+    Voice(()), // InlineQueryResultVoice
+    #[doc(hidden)]
+    Document(()), // InlineQueryResultDocument
+    #[doc(hidden)]
+    Location(()), // InlineQueryResultLocation
+    #[doc(hidden)]
+    Venue(()), // InlineQueryResultVenue
+    #[doc(hidden)]
+    Contact(()), // InlineQueryResultContact
+    #[doc(hidden)]
+    Game(()), // InlineQueryResultGame
 }
 
 /// A link to an article or web page.
