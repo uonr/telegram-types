@@ -840,7 +840,7 @@ pub enum ChatMemberStatus {
 ///
 /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct InputFile(String);
+pub struct InputFile(pub String);
 
 impl InputFile {
     /// using `multipart/form-data` under <file_attach_name> name.
