@@ -1,12 +1,15 @@
 //! Telegram bot object types.
-use super::inline_mode::InlineQuery;
+use super::games::CallbackGame;
+use super::inline_mode::{ChosenInlineResult, InlineQuery};
 use bot::utils::falsum;
 #[cfg(feature = "high")]
 use chrono::naive::NaiveDateTime;
 
 macro_rules! impl_id {
     ($Id: ident : $Ty: ty) => {
-        #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(
+            Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash,
+        )]
         pub struct $Id(pub $Ty);
 
         impl ::std::ops::Add<$Ty> for $Id {
@@ -64,6 +67,11 @@ impl_id! {MessageId : i64}
 impl_id! {UpdateId : i64}
 
 /// Unique identifier for a file
+/// # Sending by file_id
+/// * It is not possible to change the file type when resending by **file_id**. I.e. a [video](Video) can't be sent as a photo, a [photo](Photo) can't be sent as a document, etc.
+/// * It is not possible to resend thumbnails.
+/// * Resending a photo by **file_id** will send all of its [sizes](PhotoSize).
+/// * **file_id** is unique for each individual bot and can't be transferred from one bot to another.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct FileId(pub String);
 
@@ -124,9 +132,14 @@ pub enum UpdateContent {
     CallbackQuery(CallbackQuery),
     /// New incoming inline query
     InlineQuery(InlineQuery),
+    /// The result of an [inline](https://core.telegram.org/bots/api#inline-mode) query that
+    /// was chosen by a user and sent to their chat partner.
+    ///
+    /// Please see our documentation on the
+    /// [feedback collecting](https://core.telegram.org/bots/inline#collecting-feedback) for
+    /// details on how to enable these updates for your bot.
+    ChosenInlineResult(ChosenInlineResult),
     // TODO: implement these placeholders
-    #[doc(hidden)]
-    ChosenInlineResult(()),
     #[doc(hidden)]
     ShippingQuery(()),
     #[doc(hidden)]
@@ -407,7 +420,6 @@ pub struct Document {
     pub file_size: Option<i32>,
 }
 
-
 /// A video file.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Hash, Eq)]
 pub struct Video {
@@ -444,7 +456,6 @@ pub struct Animation {
     pub file_size: Option<i32>,
 }
 
-
 /// An audio file to be treated as music by the Telegram clients.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Hash, Eq)]
 pub struct Audio {
@@ -459,6 +470,8 @@ pub struct Audio {
     /// MIME type of the file as defined by sender
     pub mime_type: Option<String>,
     pub file_size: Option<i32>,
+    /// Thumbnail of the album cover to which the music file belongs
+    pub thumb: Option<PhotoSize>,
 }
 
 /// A voice note.
@@ -530,6 +543,9 @@ pub struct Venue {
     pub address: String,
     /// Foursquare identifier of the venue
     pub foursquare_id: Option<String>,
+    /// Foursquare type of the venue. (For example, “arts_entertainment/default”,
+    /// “arts_entertainment/aquarium” or “food/icecream”.)
+    pub foursquare_type: Option<String>,
 }
 
 /// One size of a photo or a [file](Document) / [sticker](Sticker) thumbnail.
@@ -667,14 +683,23 @@ pub enum InlineKeyboardButtonPressed {
     /// case the user will be automatically returned to the chat they switched from, skipping
     /// the chat selection screen.
     SwitchInlineQuery(String),
+    /// If set, pressing the button will insert the bot‘s username and the specified inline
+    /// query in the current chat's input field. Can be empty, in which case only
+    /// the bot’s username will be inserted.
+    ///
+    /// This offers a quick way for the user to open your bot in inline mode in the same chat –
+    /// good for selecting something from multiple options.
     SwitchInlineQueryCurrentChat(String),
     /// Description of the game that will be launched when the user presses the button.
     ///
     /// # NOTE
     /// This type of button **must** always be the first button in the first row.
     Pay(bool),
-    #[doc(hidden)]
-    CallbackGame(()), // TODO: implement `CallbackGame`.
+    /// Description of the game that will be launched when the user presses the button.
+    ///
+    /// ## NOTE
+    /// This type of button **must** always be the first button in the first row.
+    CallbackGame(CallbackGame),
     #[serde(other)]
     /// Unknown upstream data type.
     Unknown,
@@ -808,12 +833,35 @@ pub enum ChatMemberStatus {
     Unknown,
 }
 
-// TODO: InputFile
-//#[derive(Serialize, Deserialize,  Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-//pub struct InputFile {
-//
-//}
+/// The contents of a file to be uploaded.
+///
+/// Must be posted using `multipart/form-data` in the usual way that
+/// files are uploaded via the browser.
+///
+/// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct InputFile(String);
 
+impl InputFile {
+    /// using `multipart/form-data` under <file_attach_name> name.
+    pub fn new<S: AsRef<str>>(file_attach_name: S) -> InputFile {
+        let attach = format!("attach://{}", file_attach_name.as_ref());
+        InputFile(attach)
+    }
+}
+
+/// There are three ways to send files
+///
+/// 1. If the file is already stored somewhere on the Telegram servers, you don't need to reupload it: each file object has a **file_id** field, simply pass this **file_id** as a parameter instead of uploading. There are **no limits** for files sent this way.
+/// 2. Provide Telegram with an HTTP URL for the file to be sent. Telegram will download and send the file. 5 MB max size for photos and 20 MB max for other types of content.
+/// 3. Post the file using multipart/form-data in the usual way that files are uploaded via the browser. 10 MB max size for photos, 50 MB for other files.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(untagged)]
+pub enum FileToSend {
+    FileId(FileId),
+    Url(String),
+    InputFile(InputFile),
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Sticker {
@@ -861,8 +909,6 @@ pub struct MaskPosition {
     pub scale: f32,
 }
 
-
-// TODO: url and attach methods.
 /// The content of a media message to be sent.
 #[serde(tag = "type")]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -877,7 +923,7 @@ pub enum InputMedia {
         /// under <file_attach_name> name.
         ///
         /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
-        media: FileId,
+        media: FileToSend,
         /// *Optional*. Caption of the photo to be sent, 0-200 characters
         caption: Option<String>,
         /// *Optional*. Send Markdown or HTML, if you want Telegram apps to show
@@ -900,7 +946,7 @@ pub enum InputMedia {
         /// under <file_attach_name> name.
         ///
         /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
-        media: FileId,
+        media: FileToSend,
         /// *Optional*. Caption of the photo to be sent, 0-200 characters
         caption: Option<String>,
         /// *Optional*. Send Markdown or HTML, if you want Telegram apps to show
@@ -918,7 +964,7 @@ pub enum InputMedia {
         /// under <file_attach_name> name.
         ///
         /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
-        media: FileId,
+        media: FileToSend,
         /// Thumbnail of the file sent.
         ///
         /// The thumbnail should be in JPEG format and less than 200 kB in size.
@@ -930,7 +976,7 @@ pub enum InputMedia {
         /// Thumbnails can’t be reused and can be only uploaded as a new file,
         /// so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded
         /// using multipart/form-data under <file_attach_name>.
-        thumb: Option<String>,
+        thumb: Option<InputFile>,
         caption: Option<String>,
         parse_mode: Option<ParseMode>,
         width: Option<i32>,

@@ -1,8 +1,8 @@
 //! Request parameters types of Telegram bot methods.
 use super::types;
 use super::types::{
-    ChatId, ForceReply, InlineKeyboardMarkup, MessageId, ParseMode, ReplyKeyboardMarkup,
-    ReplyKeyboardRemove, UpdateId, UserId,
+    ChatId, FileToSend, ForceReply, InlineKeyboardMarkup, MessageId, ParseMode,
+    ReplyKeyboardMarkup, ReplyKeyboardRemove, UpdateId, UserId,
 };
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -53,7 +53,6 @@ impl<'a> GetUpdates<'a> {
         self.offset = Some(x)
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct ApiError {
@@ -166,18 +165,11 @@ impl<'a> SendMessage<'a> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
-#[serde(untagged)]
-pub enum File {
-    Id(types::FileId),
-    Url(String),
-}
-
 /// Use this method to send .webp stickers.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct SendSticker<'a> {
     pub chat_id: ChatTarget<'a>,
-    pub sticker: File,
+    pub sticker: FileToSend,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_notification: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -187,7 +179,7 @@ pub struct SendSticker<'a> {
 }
 
 impl<'a> SendSticker<'a> {
-    pub fn new(chat_id: ChatTarget<'a>, sticker: File) -> SendSticker<'a> {
+    pub fn new(chat_id: ChatTarget<'a>, sticker: FileToSend) -> SendSticker<'a> {
         SendSticker {
             chat_id,
             sticker,
@@ -216,7 +208,7 @@ impl<'a> SendSticker<'a> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct SendPhoto<'a> {
     pub chat_id: ChatTarget<'a>,
-    pub photo: File,
+    pub photo: FileToSend,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub caption: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -230,7 +222,7 @@ pub struct SendPhoto<'a> {
 }
 
 impl<'a> SendPhoto<'a> {
-    pub fn new(chat_id: ChatTarget<'a>, photo: File) -> SendPhoto<'a> {
+    pub fn new(chat_id: ChatTarget<'a>, photo: FileToSend) -> SendPhoto<'a> {
         SendPhoto {
             chat_id,
             photo,
@@ -267,7 +259,7 @@ impl<'a> SendPhoto<'a> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct SendDocument<'a> {
     pub chat_id: ChatTarget<'a>,
-    pub document: File,
+    pub document: FileToSend,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub caption: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -281,7 +273,7 @@ pub struct SendDocument<'a> {
 }
 
 impl<'a> SendDocument<'a> {
-    pub fn new(chat_id: ChatTarget<'a>, document: File) -> SendDocument<'a> {
+    pub fn new(chat_id: ChatTarget<'a>, document: FileToSend) -> SendDocument<'a> {
         SendDocument {
             chat_id,
             document,
@@ -539,45 +531,31 @@ pub trait Method: Serialize {
     }
 }
 
-#[macro_export]
-macro_rules! impl_method {
-    ($Type: ty, $lifetime: lifetime, $name: expr, $Item: ty) => {
-        impl<$lifetime> $crate::bot::methods::Method for $Type {
-            const NAME: &'static str = $name;
-            type Item = $Item;
-        }
-    };
-    ($Type: ty, $name: expr, $Item: ty) => {
-        impl $crate::bot::methods::Method for $Type {
-            const NAME: &'static str = $name;
-            type Item = $Item;
-        }
-    };
-}
-
-//           Type                           Method                   Return
-impl_method!(GetMe, "getMe", types::User);
-impl_method!(DeleteWebhook, "deleteWebhook", bool);
-impl_method!(GetWebhookInfo, "getWebhookInfo", types::WebhookInfo);
-impl_method!(GetUpdates<'a>           , 'a, "getUpdates"           , Vec<types::Update>    );
-impl_method!(SetWebhook<'a>           , 'a, "setWebhook"           , bool                  );
-impl_method!(SendMessage<'a>          , 'a, "sendMessage"          , types::Message        );
-impl_method!(ForwardMessage<'a>       , 'a, "forwardMessage"       , types::Message        );
-impl_method!(EditMessageText<'a>      , 'a, "editMessageText"      , types::Message        );
-impl_method!(DeleteMessage<'a>        , 'a, "deleteMessage"        , bool                  );
-impl_method!(EditMessageCaption<'a>   , 'a, "editMessageCaption"   , bool                  );
-impl_method!(SendSticker<'a>          , 'a, "sendSticker"          , types::Message        );
-impl_method!(SendPhoto<'a>            , 'a, "sendPhoto"            , types::Message        );
-impl_method!(SendDocument<'a>         , 'a, "sendDocument"         , types::Message        );
-impl_method!(GetChat<'a>              , 'a, "getChat"              , types::Chat           );
-impl_method!(GetChatAdministrators<'a>, 'a, "getChatAdministrators", Vec<types::ChatMember>);
-impl_method!(GetChatMembersCount<'a>  , 'a, "getChatMembersCount"  , i32                   );
-impl_method!(GetChatMember<'a>        , 'a, "getChatMember"        , types::ChatMember     );
+#[rustfmt::skip]
+impl_method_table!(
+//  [               MethodType,      method_url_segment,          ApiReturnType],
+    [                    GetMe,                 "getMe",            types::User],
+    [            DeleteWebhook,         "deleteWebhook",                   bool],
+    [           GetWebhookInfo,        "getWebhookInfo",     types::WebhookInfo],
+    [           GetUpdates<'_>,            "getUpdates",     Vec<types::Update>],
+    [           SetWebhook<'_>,            "setWebhook",                   bool],
+    [          SendMessage<'_>,           "sendMessage",         types::Message],
+    [       ForwardMessage<'_>,        "forwardMessage",         types::Message],
+    [      EditMessageText<'_>,       "editMessageText",         types::Message],
+    [        DeleteMessage<'_>,         "deleteMessage",                   bool],
+    [   EditMessageCaption<'_>,    "editMessageCaption",                   bool],
+    [          SendSticker<'_>,           "sendSticker",         types::Message],
+    [            SendPhoto<'_>,             "sendPhoto",         types::Message],
+    [         SendDocument<'_>,          "sendDocument",         types::Message],
+    [              GetChat<'_>,               "getChat",            types::Chat],
+    [GetChatAdministrators<'_>, "getChatAdministrators", Vec<types::ChatMember>],
+    [  GetChatMembersCount<'_>,   "getChatMembersCount",                    i32],
+    [        GetChatMember<'_>,         "getChatMember",      types::ChatMember]
+);
 
 // https://core.telegram.org/bots/api#making-requests
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-pub struct TelegramResult<T>
-{
+pub struct TelegramResult<T> {
     pub ok: bool,
     pub description: Option<String>,
     pub error_code: Option<i32>,

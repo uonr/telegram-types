@@ -69,7 +69,7 @@ pub struct AnswerInlineQuery<'a> {
     pub switch_pm_parameter: Option<Cow<'a, str>>,
 }
 
-impl_method!(AnswerInlineQuery<'a>    , 'a, "answerInlineQuery"    , bool                  );
+impl_method!(AnswerInlineQuery<'_>, "answerInlineQuery", bool);
 
 /// One result of an inline query.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
