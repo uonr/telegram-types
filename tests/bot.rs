@@ -65,6 +65,8 @@ fn failure() {
     let raw = include_str!("json/error.json");
     let update = serde_json::from_str::<methods::UpdateList>(&raw).unwrap();
     assert!(update.result.is_none());
+    assert_eq!(update.error_code, Some(401));
+    assert_eq!(update.description, Some("Unauthorized".to_string()))
 }
 
 #[test]
@@ -84,4 +86,27 @@ fn unknown() {
     let raw = r#"{"type": "Papika", "Cocona": "Mimi"}"#;
     let chat_type = from_str::<ChatType>(raw).unwrap();
     assert_eq!(chat_type, ChatType::Unknown);
+}
+
+
+#[test]
+fn file_id() {
+    use serde_json::{to_string, from_str};
+    use telegram_types::bot::types::FileToSend;
+    let file_id = types::FileId("42".to_string());
+    let file_to_send = FileToSend::FileId(file_id);
+    let file_id_serialized = to_string(&file_to_send).unwrap();
+    let file_id_deserialized = from_str::<FileToSend>(&*file_id_serialized);
+    assert_eq!(file_id_serialized, "\"42\"".to_string());
+    assert_eq!(file_id_deserialized.unwrap(), file_to_send);
+}
+
+#[test]
+fn input_file() {
+    use serde_json::{to_string};
+    use telegram_types::bot::types::{FileToSend, InputFile};
+    let input_file = InputFile::new("cocona.webp");
+    let input_file = FileToSend::InputFile(input_file);
+    let input_file_serialized = to_string(&input_file).unwrap();
+    assert_eq!(input_file_serialized, r#""attach://cocona.webp""#);
 }
