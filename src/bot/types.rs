@@ -697,6 +697,8 @@ pub enum InlineKeyboardButtonPressed {
     /// ## NOTE
     /// This type of button **must** always be the first button in the first row.
     CallbackGame(CallbackGame),
+    /// An HTTP URL used to automatically authorize the user.
+    LoginUrl(LoginUrl),
     #[serde(other)]
     /// Unknown upstream data type.
     Unknown,
@@ -1002,6 +1004,35 @@ pub enum InputMedia {
     #[serde(other)]
     /// Unknown upstream data type.
     Unknown,
+}
+
+/// a parameter of the inline keyboard button used to automatically authorize a user.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct LoginUrl {
+    /// An HTTP URL to be opened with user authorization data added to the query string when
+    /// the button is pressed.
+    ///
+    /// If the user refuses to provide authorization data, the original URL without information
+    /// about the user will be opened. The data added is the same as described in
+    /// [Receiving authorization data](https://core.telegram.org/widgets/login#receiving-authorization-data).
+    ///
+    /// ## Note
+    ///
+    /// You **must** always check the hash of the received data to verify the authentication and
+    /// the integrity of the data as described in [Checking authorization](https://core.telegram.org/widgets/login#checking-authorization).
+    pub url: String,
+    /// New text of the button in forwarded messages.
+    pub forward_text: Option<String>,
+    /// Username of a bot, which will be used for user authorization.
+    ///
+    /// See Setting up a bot for more details.
+    /// If not specified, the current bot's username will be assumed.
+    /// The *url*'s domain must be the same as the domain linked with the bot.
+    /// See [Linking your domain to the bot](https://core.telegram.org/widgets/login#linking-your-domain-to-the-bot)
+    /// for more details.
+    pub bot_username: Option<String>,
+    /// Pass True to request the permission for your bot to send messages to the user.
+    pub request_write_access: Option<bool>,
 }
 
 /// Send *Markdown or HTML*, if you want Telegram apps to show
