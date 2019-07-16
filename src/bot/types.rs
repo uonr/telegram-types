@@ -48,22 +48,12 @@ macro_rules! impl_id {
     };
 }
 
-/// Unique identifier for user.
 impl_id! {UserId : i64}
 
-/// Unique identifier for this chat.
 impl_id! {ChatId : i64}
 
-/// Unique message identifier inside a chat
 impl_id! {MessageId : i64}
 
-/// The update‘s unique identifier.
-///
-/// Update identifiers start from a certain positive number and increase sequentially.
-/// This ID becomes especially handy if you’re using Webhooks,
-/// since it allows you to ignore repeated updates or to restore the correct update sequence,
-/// should they get out of order. If there are no new updates for at least a week,
-/// then identifier of the next update will be chosen randomly instead of sequentially.
 impl_id! {UpdateId : i64}
 
 /// Unique identifier for a file
