@@ -259,6 +259,9 @@ pub struct Message {
     pub forward_from_message_id: Option<MessageId>,
     /// For messages forwarded from channels, signature of the post author if present
     pub forward_signature: Option<String>,
+    /// Sender's name for messages forwarded from users who disallow adding a link to their account
+    /// in forwarded messages
+    pub forward_sender_name: Option<String>,
     /// For forwarded messages, date the original message was sent in Unix time
     pub forward_date: Option<Time>,
     /// For replies, the original message.
@@ -347,6 +350,10 @@ pub struct Message {
     pub pinned_message: Option<Box<Message>>,
     /// The domain name of the website on which the user has logged in.
     pub connected_website: Option<String>,
+    /// Inline keyboard attached to the message.
+    ///
+    /// `login_url` buttons are represented as ordinary `url` buttons.
+    pub reply_markup: Option<InlineKeyboardMarkup>,
 }
 
 /// One special entity in a text message.
@@ -791,10 +798,12 @@ pub struct ChatMember {
     pub can_restrict_members: Option<bool>,
     /// Administrators only. True, if the administrator can pin messages, supergroups only
     pub can_pin_messages: Option<bool>,
-    ///  Administrators only. True, if the administrator can add new administrators with a subset
+    /// Administrators only. True, if the administrator can add new administrators with a subset
     /// of his own privileges or demote administrators that he has promoted, directly or
     /// indirectly (promoted by administrators that were appointed by the user)
     pub can_promote_members: Option<bool>,
+    /// Restricted only. True, if the user is a member of the chat at the moment of the request
+    pub is_member: Option<bool>,
     /// Restricted only. True, if the user can send text messages, contacts, locations and venues
     pub can_send_messages: Option<bool>,
     /// Restricted only. True, if the user can send audios, documents, photos, videos, video notes
@@ -972,6 +981,23 @@ pub enum InputMedia {
         width: Option<i32>,
         height: Option<i32>,
         duration: Option<i32>,
+    },
+    #[serde(rename = "audio")]
+    Audio {
+        media: FileToSend,
+        thumb: Option<InputFile>,
+        caption: Option<String>,
+        parse_mode: Option<ParseMode>,
+        duration: Option<i32>,
+        performer: Option<String>,
+        title: Option<String>,
+    },
+    #[serde(rename = "document")]
+    Document {
+        media: FileToSend,
+        thumb: Option<InputFile>,
+        caption: Option<String>,
+        parse_mode: Option<ParseMode>,
     },
     #[serde(other)]
     /// Unknown upstream data type.
