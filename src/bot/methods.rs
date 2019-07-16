@@ -10,6 +10,7 @@ use std::borrow::Cow;
 use std::default::Default;
 use std::error::Error;
 use std::fmt;
+use bot::types::InputMedia;
 
 /// Chat integer identifier or username
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -475,6 +476,35 @@ impl<'a> EditMessageCaption<'a> {
         Self {
             reply_markup: Some(markup),
             ..self
+        }
+    }
+}
+/// Use this method to edit animation, audio, document, photo, or video messages. If a message is
+/// a part of a message album, then it can be edited only to a photo or a video. Otherwise, message
+/// type can be changed arbitrarily. When inline message is edited, new file can't be uploaded. Use
+/// previously uploaded file via its file_id or specify a URL. On success, if the edited message was
+/// sent by the bot, the edited [`Message`](types::Message) is returned, otherwise True is returned.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct EditMessageMedia<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub chat_id: Option<ChatTarget<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message_id: Option<MessageId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inline_message_id: Option<String>,
+    pub media: InputMedia,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_markup: Option<InlineKeyboardMarkup>,
+}
+
+impl<'a> EditMessageMedia<'a> {
+    pub fn new(chat_id: ChatTarget<'a>, message_id: MessageId, media: InputMedia) -> EditMessageMedia<'a> {
+        EditMessageMedia {
+            chat_id: Some(chat_id),
+            message_id: Some(message_id),
+            inline_message_id: None,
+            media,
+            reply_markup: None,
         }
     }
 }
