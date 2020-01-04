@@ -593,8 +593,9 @@ pub struct TelegramResult<T> {
     pub parameters: Option<types::ResponseParameters>,
 }
 
-impl<T> Into<Result<T, ApiError>> for TelegramResult<T> {
-    fn into(self) -> Result<T, ApiError> {
+impl<T> TelegramResult<T> {
+    /// Convert the `TelegramResult` into `std` `Result`.
+    pub fn into_result(self) -> Result<T, ApiError> {
         if self.ok {
             let api_error = ApiError {
                 error_code: 0,
@@ -619,6 +620,12 @@ impl<T> Into<Result<T, ApiError>> for TelegramResult<T> {
                 parameters: self.parameters,
             })
         }
+    }
+}
+
+impl<T> Into<Result<T, ApiError>> for TelegramResult<T> {
+    fn into(self) -> Result<T, ApiError> {
+        self.into_result()
     }
 }
 
