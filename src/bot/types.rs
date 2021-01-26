@@ -1040,6 +1040,7 @@ pub struct LoginUrl {
 /// in the media caption.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum ParseMode {
+    Markdown,
     MarkdownV2,
     HTML,
     #[serde(other)]
