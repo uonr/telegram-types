@@ -1041,6 +1041,7 @@ pub struct LoginUrl {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum ParseMode {
     Markdown,
+    MarkdownV2,
     HTML,
     #[serde(other)]
     /// Unknown upstream data type.
