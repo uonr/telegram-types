@@ -61,6 +61,12 @@ fn update() {
 }
 
 #[test]
+fn update_my_chat_member() {
+    let raw = include_str!("json/update_my_chat_member.json");
+    let _updates = serde_json::from_str::<methods::UpdateList>(&raw).unwrap();
+}
+
+#[test]
 fn failure() {
     let raw = include_str!("json/error.json");
     let update = serde_json::from_str::<methods::UpdateList>(&raw).unwrap();

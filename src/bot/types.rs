@@ -118,8 +118,6 @@ pub enum UpdateContent {
     ChannelPost(Message),
     /// New version of a channel post that is known to the bot and was edited
     EditedChannelPost(Message),
-    /// New incoming callback query
-    CallbackQuery(CallbackQuery),
     /// New incoming inline query
     InlineQuery(InlineQuery),
     /// The result of an [inline](https://core.telegram.org/bots/api#inline-mode) query that
@@ -129,14 +127,21 @@ pub enum UpdateContent {
     /// [feedback collecting](https://core.telegram.org/bots/inline#collecting-feedback) for
     /// details on how to enable these updates for your bot.
     ChosenInlineResult(ChosenInlineResult),
+    /// New incoming callback query
+    CallbackQuery(CallbackQuery),
     // TODO: implement these placeholders
     #[doc(hidden)]
-    ShippingQuery(()),
+    ShippingQuery {},
     #[doc(hidden)]
-    PreCheckoutQuery(()),
-    #[serde(other)]
-    /// Unknown upstream data type.
-    Unknown,
+    PreCheckoutQuery {},
+    #[doc(hidden)]
+    Poll {},
+    #[doc(hidden)]
+    PollAnswer {},
+    #[doc(hidden)]
+    MyChatMember {},
+    #[doc(hidden)]
+    ChatMember {},
 }
 
 /// Contains information about the current status of a webhook.
