@@ -7,6 +7,7 @@ categories = ["api-bindings"]
 license = "MIT"
 description = "Types in the Telegram Bot API and their deserializers"
 readme = "README.md"
+edition = "2018"
 [badges]
 travis-ci = { repository = "quanbrew/telegram-types", branch = "master" }
 
@@ -18,3 +19,10 @@ serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
 chrono = { version = "0.4", features = ["serde"], optional = true }
+
+[dev-dependencies]
+reqwest = "0.11"
+
+[dev-dependencies.tokio]
+version = "1"
+features = ["full"]

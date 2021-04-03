@@ -1,7 +1,7 @@
 //! Telegram bot object types.
 use super::games::CallbackGame;
 use super::inline_mode::{ChosenInlineResult, InlineQuery};
-use bot::utils::falsum;
+use super::utils::falsum;
 #[cfg(feature = "high")]
 use chrono::naive::NaiveDateTime;
 
@@ -104,7 +104,8 @@ pub struct Update {
     /// The update‘s unique identifier.
     pub update_id: UpdateId,
     #[serde(flatten)]
-    pub content: UpdateContent,
+    // `Option` is a workaround for https://github.com/serde-rs/serde/issues/1626
+    pub content: Option<UpdateContent>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -131,17 +132,40 @@ pub enum UpdateContent {
     CallbackQuery(CallbackQuery),
     // TODO: implement these placeholders
     #[doc(hidden)]
-    ShippingQuery {},
+    ShippingQuery(ShippingQuery),
     #[doc(hidden)]
-    PreCheckoutQuery {},
+    PreCheckoutQuery(PreCheckoutQuery),
     #[doc(hidden)]
-    Poll {},
+    Poll(Poll),
     #[doc(hidden)]
-    PollAnswer {},
+    PollAnswer(PollAnswer),
     #[doc(hidden)]
-    MyChatMember {},
+    MyChatMember(ChatMemberUpdated),
     #[doc(hidden)]
-    ChatMember {},
+    ChatMember(ChatMemberUpdated),
+    /// Unknown update type
+    Unknown,
+}
+impl Default for UpdateContent {
+    fn default() -> Self {
+        UpdateContent::Unknown {}
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct ShippingQuery {
+}
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct PreCheckoutQuery {
+}
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Poll {
+}
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct PollAnswer {
+}
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct ChatMemberUpdated {
 }
 
 /// Contains information about the current status of a webhook.
@@ -153,6 +177,8 @@ pub struct WebhookInfo {
     pub has_custom_certificate: bool,
     /// Number of updates awaiting delivery
     pub pending_update_count: i32,
+    /// Currently used webhook IP address
+    pub ip_address: Option<String>,
     /// Unix time for the most recent error that happened when trying to deliver an update via
     /// webhook
     pub last_error_date: Option<Time>,
@@ -183,9 +209,9 @@ pub struct User {
 }
 
 /// Type of chat
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum ChatType {
     Private {
         username: Option<String>,
@@ -825,8 +851,8 @@ pub struct ChatMember {
 }
 
 /// The member's status in the chat.
-#[serde(rename_all = "lowercase")]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(rename_all = "lowercase")]
 pub enum ChatMemberStatus {
     Creator,
     Administrator,
@@ -916,8 +942,8 @@ pub struct MaskPosition {
 }
 
 /// The content of a media message to be sent.
-#[serde(tag = "type")]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "type")]
 pub enum InputMedia {
     #[serde(rename = "video")]
     Video {

@@ -10,7 +10,8 @@ use std::borrow::Cow;
 use std::default::Default;
 use std::error::Error;
 use std::fmt;
-use bot::types::InputMedia;
+use super::types::InputMedia;
+use std::net::IpAddr;
 
 /// Chat integer identifier or username
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -80,11 +81,26 @@ impl Error for ApiError {
 /// after a reasonable amount of attempts. Returns True on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct SetWebhook<'a> {
+    /// HTTPS url to send updates to. Use an empty string to remove webhook integration
     pub url: Cow<'a, str>,
+
+    /// The fixed IP address which will be used to send webhook requests instead of the IP address
+    /// resolved through DNS
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ip_address: Option<IpAddr>,
+
+    /// Maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery,
+    /// 1-100. Defaults to *40*. Use lower values to limit the load on your bot's server, and higher
+    /// values to increase your bot's throughput.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_connections: Option<i32>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allowed_updates: Option<Cow<'a, [UpdateTypes]>>,
+
+    /// Pass True to drop all pending updates.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub drop_pending_updates: Option<bool>,
 }
 
 impl<'a> SetWebhook<'a> {
@@ -93,6 +109,8 @@ impl<'a> SetWebhook<'a> {
             url: url.into(),
             max_connections: None,
             allowed_updates: None,
+            ip_address: None,
+            drop_pending_updates: None,
         }
     }
 

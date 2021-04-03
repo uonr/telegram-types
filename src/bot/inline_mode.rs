@@ -7,7 +7,7 @@
 //! the placeholder text that the user will see in the input field after typing
 //! your bot’s name.
 
-use bot::types::{InlineKeyboardMarkup, Location, ParseMode, User};
+use super::types::{InlineKeyboardMarkup, Location, ParseMode, User};
 use std::borrow::Cow;
 
 /// Unique identifier for the answered query
