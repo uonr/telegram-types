@@ -1,4 +1,4 @@
-use telegram_types::bot::methods::{ChatTarget, GetUpdates, Method, SendDocument, SendMessage, TelegramResult};
+use telegram_types::bot::methods::{ChatTarget, GetUpdates, Method, SendDocument, TelegramResult};
 use telegram_types::bot::types::{FileToSend, InputFile, Message, Update};
 use std::fmt::Debug;
 use reqwest::header::CONTENT_TYPE;
@@ -16,19 +16,18 @@ async fn make_request<T: Method + Debug>(data: &T) -> TelegramResult<T::Item> {
     serde_json::from_str(&res).unwrap()
 }
 
-async fn upload<'a>(chat_id: ChatTarget<'a>) -> TelegramResult<Message> {
-    let action = SendDocument::new(chat_id, FileToSend::InputFile(InputFile::new("hello.txt")));
+async fn upload(chat_id: ChatTarget<'_>) -> TelegramResult<Message> {
+    let file_field = "document";
+    let action = SendDocument::new(chat_id, FileToSend::InputFile(InputFile::new(file_field)));
     let token = std::env::var("BOT_TOKEN").unwrap();
     let client = reqwest::Client::new();
-    let mut url = SendDocument::url(&*token);
-    url.push('?');
-    url.push_str(&*serde_urlencoded::to_string(action).unwrap());
+    let url = format!("{}?{}", SendDocument::url(&*token), serde_urlencoded::to_string(action).unwrap());
     let part = reqwest::multipart::Part::text("hello, world")
         .file_name("hello.txt")
         .mime_str("text/plain")
         .unwrap();
     let form = reqwest::multipart::Form::new()
-        .part("hello.txt", part);
+        .part(file_field, part);
     let res = client.post(url)
         .header(CONTENT_TYPE, "multipart/form-data")
         .multipart(form)
@@ -49,9 +48,12 @@ async fn main() {
             let content = update.content.unwrap_or_default();
             match content {
                 Content::Message(message) => {
-                    if let Some(_text) = message.text.as_ref() {
+                    if let Some(text) = message.text.as_ref() {
                         let chat_id = ChatTarget::Id(message.chat.id);
-                        let _send = upload(chat_id).await;
+                        if text.contains("file") {
+                            let sent = upload(chat_id).await;
+                            dbg!(sent);
+                        }
                     }
                 }
                 _ => {}
