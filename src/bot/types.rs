@@ -278,6 +278,11 @@ pub struct Message {
     pub message_id: MessageId,
     /// Sender, empty for messages sent to channels
     pub from: Option<Box<User>>,
+    /// Sender of the message, sent on behalf of a chat.
+    /// The channel itself for channel messages.
+    /// The supergroup itself for messages from anonymous group administrators.
+    /// The linked channel for messages automatically forwarded to the discussion group
+    pub sender_chat: Option<Chat>,
     /// Date the message was sent in Unix time
     pub date: Time,
     /// Conversation the message belongs to

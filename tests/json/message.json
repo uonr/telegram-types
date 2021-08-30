@@ -8,6 +8,11 @@
         "username":"homura",
         "language_code":"zh-Hant-HK"
     },
+    "sender_chat":{
+        "id":-1001234567890,
+        "title":"Channel",
+        "type":"channel"
+    },
     "chat":{
         "id":88569449,
         "first_name":"Homura",
