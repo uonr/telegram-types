@@ -581,24 +581,26 @@ pub trait Method: Serialize {
 
 #[rustfmt::skip]
 impl_method_table!(
-//  [               MethodType,      method_url_segment,          ApiReturnType],
-    [                    GetMe,                 "getMe",            types::User],
-    [            DeleteWebhook,         "deleteWebhook",                   bool],
-    [           GetWebhookInfo,        "getWebhookInfo",     types::WebhookInfo],
-    [           GetUpdates<'_>,            "getUpdates",     Vec<types::Update>],
-    [           SetWebhook<'_>,            "setWebhook",                   bool],
-    [          SendMessage<'_>,           "sendMessage",         types::Message],
-    [       ForwardMessage<'_>,        "forwardMessage",         types::Message],
-    [      EditMessageText<'_>,       "editMessageText",         types::Message],
-    [        DeleteMessage<'_>,         "deleteMessage",                   bool],
-    [   EditMessageCaption<'_>,    "editMessageCaption",                   bool],
-    [          SendSticker<'_>,           "sendSticker",         types::Message],
-    [            SendPhoto<'_>,             "sendPhoto",         types::Message],
-    [         SendDocument<'_>,          "sendDocument",         types::Message],
-    [              GetChat<'_>,               "getChat",            types::Chat],
-    [GetChatAdministrators<'_>, "getChatAdministrators", Vec<types::ChatMember>],
-    [  GetChatMembersCount<'_>,   "getChatMembersCount",                    i32],
-    [        GetChatMember<'_>,         "getChatMember",      types::ChatMember]
+//  [                MethodType,       method_url_segment,          ApiReturnType],
+    [                     GetMe,                  "getMe",            types::User],
+    [             DeleteWebhook,          "deleteWebhook",                   bool],
+    [            GetWebhookInfo,         "getWebhookInfo",     types::WebhookInfo],
+    [            GetUpdates<'_>,             "getUpdates",     Vec<types::Update>],
+    [            SetWebhook<'_>,             "setWebhook",                   bool],
+    [           SendMessage<'_>,            "sendMessage",         types::Message],
+    [        ForwardMessage<'_>,         "forwardMessage",         types::Message],
+    [       EditMessageText<'_>,        "editMessageText",         types::Message],
+    [      EditMessageMedia<'_>,       "editMessageMedia",         types::Message],
+    [EditMessageReplyMarkup<'_>, "editMessageReplyMarkup",         types::Message],
+    [         DeleteMessage<'_>,          "deleteMessage",                   bool],
+    [    EditMessageCaption<'_>,     "editMessageCaption",                   bool],
+    [           SendSticker<'_>,            "sendSticker",         types::Message],
+    [             SendPhoto<'_>,              "sendPhoto",         types::Message],
+    [          SendDocument<'_>,           "sendDocument",         types::Message],
+    [               GetChat<'_>,                "getChat",            types::Chat],
+    [ GetChatAdministrators<'_>,  "getChatAdministrators", Vec<types::ChatMember>],
+    [   GetChatMembersCount<'_>,    "getChatMembersCount",                    i32],
+    [         GetChatMember<'_>,          "getChatMember",      types::ChatMember]
 );
 
 // https://core.telegram.org/bots/api#making-requests
