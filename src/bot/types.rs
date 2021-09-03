@@ -962,15 +962,21 @@ pub enum InputMedia {
         /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
         media: FileToSend,
         /// *Optional*. Caption of the photo to be sent, 0-200 characters
+        #[serde(skip_serializing_if = "Option::is_none")]
         caption: Option<String>,
         /// *Optional*. Send Markdown or HTML, if you want Telegram apps to show
         /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options)
         /// in the media caption.
+        #[serde(skip_serializing_if = "Option::is_none")]
         parse_mode: Option<ParseMode>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         width: Option<i32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         height: Option<i32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         duration: Option<i32>,
         /// Pass True, if the uploaded video is suitable for streaming
+        #[serde(skip_serializing_if = "Option::is_none")]
         supports_streaming: Option<bool>,
     },
     #[serde(rename = "photo")]
@@ -985,10 +991,12 @@ pub enum InputMedia {
         /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
         media: FileToSend,
         /// *Optional*. Caption of the photo to be sent, 0-200 characters
+        #[serde(skip_serializing_if = "Option::is_none")]
         caption: Option<String>,
         /// *Optional*. Send Markdown or HTML, if you want Telegram apps to show
         /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options)
         /// in the media caption.
+        #[serde(skip_serializing_if = "Option::is_none")]
         parse_mode: Option<ParseMode>,
     },
     #[serde(rename = "animation")]
@@ -1013,28 +1021,43 @@ pub enum InputMedia {
         /// Thumbnails can’t be reused and can be only uploaded as a new file,
         /// so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded
         /// using multipart/form-data under <file_attach_name>.
+        #[serde(skip_serializing_if = "Option::is_none")]
         thumb: Option<InputFile>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         caption: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         parse_mode: Option<ParseMode>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         width: Option<i32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         height: Option<i32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         duration: Option<i32>,
     },
     #[serde(rename = "audio")]
     Audio {
         media: FileToSend,
+        #[serde(skip_serializing_if = "Option::is_none")]
         thumb: Option<InputFile>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         caption: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         parse_mode: Option<ParseMode>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         duration: Option<i32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         performer: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         title: Option<String>,
     },
     #[serde(rename = "document")]
     Document {
         media: FileToSend,
+        #[serde(skip_serializing_if = "Option::is_none")]
         thumb: Option<InputFile>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         caption: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         parse_mode: Option<ParseMode>,
     },
     #[serde(other)]
