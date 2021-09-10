@@ -472,6 +472,63 @@ pub struct GetChatMember<'a> {
     pub user_id: UserId,
 }
 
+/// Use this method to send answers to callback queries sent from inline keyboards. The answer will
+/// be displayed to the user as a notification at the top of the chat screen or as an alert.
+///
+/// On success, True is returned.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct AnswerCallbackQuery {
+    callback_query_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    text: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    show_alert: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    cache_time: Option<u64>,
+}
+
+impl AnswerCallbackQuery {
+    pub fn new(callback_query_id: String) -> Self {
+        Self {
+            callback_query_id,
+            text: None,
+            show_alert: None,
+            url: None,
+            cache_time: None,
+        }
+    }
+
+    pub fn text(self, text: String) -> Self {
+        Self {
+            text: Some(text),
+            ..self
+        }
+    }
+
+    pub fn show_alert(self, show_alert: bool) -> Self {
+        Self {
+            show_alert: Some(show_alert),
+            ..self
+        }
+    }
+
+    pub fn url(self, url: String) -> Self {
+        Self {
+            url: Some(url),
+            ..self
+        }
+    }
+
+    pub fn cache_time(self, cache_time: u64) -> Self {
+        Self {
+            cache_time: Some(cache_time),
+            ..self
+        }
+    }
+}
+
 /// Use this method to edit text and game messages sent by the bot or via the bot (for inline bots).
 /// On success, if edited message is sent by the bot, the edited [`Message`](types::Message) is
 /// returned, otherwise True is returned.
@@ -691,7 +748,8 @@ impl_method_table!(
     [               GetChat<'_>,                "getChat",            types::Chat],
     [ GetChatAdministrators<'_>,  "getChatAdministrators", Vec<types::ChatMember>],
     [   GetChatMembersCount<'_>,    "getChatMembersCount",                    i32],
-    [         GetChatMember<'_>,          "getChatMember",      types::ChatMember]
+    [         GetChatMember<'_>,          "getChatMember",      types::ChatMember],
+    [       AnswerCallbackQuery,    "answerCallbackQuery",                   bool]
 );
 
 // https://core.telegram.org/bots/api#making-requests
