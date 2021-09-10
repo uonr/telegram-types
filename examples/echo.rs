@@ -1,12 +1,13 @@
-use telegram_types::bot::methods::{Method, TelegramResult, GetUpdates, SendMessage, ChatTarget};
-use telegram_types::bot::types::Update;
-use std::fmt::Debug;
 use reqwest::header::CONTENT_TYPE;
+use std::fmt::Debug;
+use telegram_types::bot::methods::{ChatTarget, GetUpdates, Method, SendMessage, TelegramResult};
+use telegram_types::bot::types::Update;
 
 async fn make_request<T: Method + Debug>(data: &T) -> TelegramResult<T::Item> {
     let token = std::env::var("BOT_TOKEN").unwrap();
     let client = reqwest::Client::new();
-    let res = client.post(T::url(&*token))
+    let res = client
+        .post(T::url(&*token))
         .header(CONTENT_TYPE, "application/json")
         .body(serde_json::to_string(data).unwrap())
         .send()

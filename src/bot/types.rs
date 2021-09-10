@@ -153,20 +153,15 @@ impl Default for UpdateContent {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct ShippingQuery {
-}
+pub struct ShippingQuery {}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct PreCheckoutQuery {
-}
+pub struct PreCheckoutQuery {}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct Poll {
-}
+pub struct Poll {}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct PollAnswer {
-}
+pub struct PollAnswer {}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct ChatMemberUpdated {
-}
+pub struct ChatMemberUpdated {}
 
 /// Contains information about the current status of a webhook.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]

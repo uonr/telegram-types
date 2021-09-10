@@ -1,12 +1,13 @@
+use reqwest::header::CONTENT_TYPE;
+use std::fmt::Debug;
 use telegram_types::bot::methods::{ChatTarget, GetUpdates, Method, SendDocument, TelegramResult};
 use telegram_types::bot::types::{FileToSend, InputFile, Message, Update};
-use std::fmt::Debug;
-use reqwest::header::CONTENT_TYPE;
 
 async fn make_request<T: Method + Debug>(data: &T) -> TelegramResult<T::Item> {
     let token = std::env::var("BOT_TOKEN").unwrap();
     let client = reqwest::Client::new();
-    let res = client.post(T::url(&*token))
+    let res = client
+        .post(T::url(&*token))
         .header(CONTENT_TYPE, "application/json")
         .body(serde_json::to_string(data).unwrap())
         .send()
@@ -21,14 +22,18 @@ async fn upload(chat_id: ChatTarget<'_>) -> TelegramResult<Message> {
     let action = SendDocument::new(chat_id, FileToSend::InputFile(InputFile::new(file_field)));
     let token = std::env::var("BOT_TOKEN").unwrap();
     let client = reqwest::Client::new();
-    let url = format!("{}?{}", SendDocument::url(&*token), serde_urlencoded::to_string(action).unwrap());
+    let url = format!(
+        "{}?{}",
+        SendDocument::url(&*token),
+        serde_urlencoded::to_string(action).unwrap()
+    );
     let part = reqwest::multipart::Part::text("hello, world")
         .file_name("hello.txt")
         .mime_str("text/plain")
         .unwrap();
-    let form = reqwest::multipart::Form::new()
-        .part(file_field, part);
-    let res = client.post(url)
+    let form = reqwest::multipart::Form::new().part(file_field, part);
+    let res = client
+        .post(url)
         .header(CONTENT_TYPE, "multipart/form-data")
         .multipart(form)
         .send()

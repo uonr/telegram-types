@@ -1,9 +1,10 @@
-use telegram_types::bot::methods::{Method, GetMe, TelegramResult};
+use telegram_types::bot::methods::{GetMe, Method, TelegramResult};
 
 async fn make_request<T: Method>(data: T) -> TelegramResult<T::Item> {
     let token = std::env::var("BOT_TOKEN").unwrap();
     let client = reqwest::Client::new();
-    let res = client.post(T::url(&*token))
+    let res = client
+        .post(T::url(&*token))
         .body(serde_json::to_string(&data).unwrap())
         .send()
         .await

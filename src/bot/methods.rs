@@ -1,5 +1,6 @@
 //! Request parameters types of Telegram bot methods.
 use super::types;
+use super::types::InputMedia;
 use super::types::{
     ChatId, FileToSend, ForceReply, InlineKeyboardMarkup, MessageId, ParseMode,
     ReplyKeyboardMarkup, ReplyKeyboardRemove, UpdateId, UserId,
@@ -10,7 +11,6 @@ use std::borrow::Cow;
 use std::default::Default;
 use std::error::Error;
 use std::fmt;
-use super::types::InputMedia;
 use std::net::IpAddr;
 
 /// Chat integer identifier or username
@@ -516,7 +516,11 @@ pub struct EditMessageMedia<'a> {
 }
 
 impl<'a> EditMessageMedia<'a> {
-    pub fn new(chat_id: ChatTarget<'a>, message_id: MessageId, media: InputMedia) -> EditMessageMedia<'a> {
+    pub fn new(
+        chat_id: ChatTarget<'a>,
+        message_id: MessageId,
+        media: InputMedia,
+    ) -> EditMessageMedia<'a> {
         EditMessageMedia {
             chat_id: Some(chat_id),
             message_id: Some(message_id),
