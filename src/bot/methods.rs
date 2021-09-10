@@ -529,6 +529,22 @@ impl AnswerCallbackQuery {
     }
 }
 
+/// Use this method to send a group of photos, videos, documents or audios as an album. Documents
+/// and audio files can be only grouped in an album with messages of the same type.
+///
+/// On success, an array of `Messages` that were sent is returned.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct SendMediaGroup<'a> {
+    pub chat_id: ChatTarget<'a>,
+    pub media: Vec<types::InputMedia>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disable_notification: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_to_message_id: Option<types::MessageId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub allow_sending_without_reply: Option<bool>,
+}
+
 /// Use this method to edit text and game messages sent by the bot or via the bot (for inline bots).
 /// On success, if edited message is sent by the bot, the edited [`Message`](types::Message) is
 /// returned, otherwise True is returned.
@@ -737,6 +753,7 @@ impl_method_table!(
     [           SendMessage<'_>,            "sendMessage",         types::Message],
     [        ForwardMessage<'_>,         "forwardMessage",         types::Message],
     [           CopyMessage<'_>,            "copyMessage", types::MessageIdResult],
+    [        SendMediaGroup<'_>,         "sendMediaGroup",    Vec<types::Message>],
     [       EditMessageText<'_>,        "editMessageText",         types::Message],
     [      EditMessageMedia<'_>,       "editMessageMedia",         types::Message],
     [EditMessageReplyMarkup<'_>, "editMessageReplyMarkup",         types::Message],
