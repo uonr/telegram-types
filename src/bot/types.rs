@@ -65,6 +65,12 @@ impl_id! {UpdateId : i64}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct FileId(pub String);
 
+/// This object represents a unique message identifier.
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct MessageIdResult {
+    pub message_id: MessageId,
+}
+
 /// The UNIX timestamp
 #[cfg(not(feature = "high"))]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]

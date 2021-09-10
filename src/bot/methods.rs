@@ -334,6 +334,92 @@ pub struct ForwardMessage<'a> {
     pub message_id: MessageId,
 }
 
+/// Use this method to copy messages of any kind. Service messages and invoice messages can't be
+/// copied. The method is analogous to the method `forwardMessage`, but the copied message doesn't
+/// have a link to the original message.
+///
+/// Returns the `MessageIdResult` of the sent message on success.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct CopyMessage<'a> {
+    pub chat_id: ChatTarget<'a>,
+    pub from_chat_id: ChatTarget<'a>,
+    pub message_id: types::MessageId,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub caption: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parse_mode: Option<types::ParseMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disable_notification: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_to_message_id: Option<types::MessageId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub allow_sending_without_reply: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_markup: Option<ReplyMarkup>,
+}
+
+impl<'a> CopyMessage<'a> {
+    pub fn new(
+        chat_id: ChatTarget<'a>,
+        from_chat_id: ChatTarget<'a>,
+        message_id: types::MessageId,
+    ) -> Self {
+        Self {
+            chat_id,
+            from_chat_id,
+            message_id,
+            caption: None,
+            parse_mode: None,
+            disable_notification: None,
+            reply_to_message_id: None,
+            allow_sending_without_reply: None,
+            reply_markup: None,
+        }
+    }
+
+    pub fn caption(self, caption: String) -> Self {
+        Self {
+            caption: Some(caption),
+            ..self
+        }
+    }
+
+    pub fn parse_mode(self, parse_mode: types::ParseMode) -> Self {
+        Self {
+            parse_mode: Some(parse_mode),
+            ..self
+        }
+    }
+
+    pub fn disable_notification(self, disable_notification: bool) -> Self {
+        Self {
+            disable_notification: Some(disable_notification),
+            ..self
+        }
+    }
+
+    pub fn reply_to_message_id(self, reply_to_message_id: types::MessageId) -> Self {
+        Self {
+            reply_to_message_id: Some(reply_to_message_id),
+            ..self
+        }
+    }
+
+    pub fn allow_sending_without_reply(self, allow_sending_without_reply: bool) -> Self {
+        Self {
+            allow_sending_without_reply: Some(allow_sending_without_reply),
+            ..self
+        }
+    }
+
+    pub fn reply_markup(self, reply_markup: ReplyMarkup) -> Self {
+        Self {
+            reply_markup: Some(reply_markup),
+            ..self
+        }
+    }
+}
+
 /// To get a list of profile pictures for a user. Returns a [`UserProfilePhotos`](types::UserProfilePhotos) object.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct GetUserProfilePhotos {
@@ -593,6 +679,7 @@ impl_method_table!(
     [            SetWebhook<'_>,             "setWebhook",                   bool],
     [           SendMessage<'_>,            "sendMessage",         types::Message],
     [        ForwardMessage<'_>,         "forwardMessage",         types::Message],
+    [           CopyMessage<'_>,            "copyMessage", types::MessageIdResult],
     [       EditMessageText<'_>,        "editMessageText",         types::Message],
     [      EditMessageMedia<'_>,       "editMessageMedia",         types::Message],
     [EditMessageReplyMarkup<'_>, "editMessageReplyMarkup",         types::Message],
