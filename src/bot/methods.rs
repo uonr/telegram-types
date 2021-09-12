@@ -1,5 +1,6 @@
 //! Request parameters types of Telegram bot methods.
 use super::types;
+use super::types::InputMedia;
 use super::types::{
     ChatId, FileToSend, ForceReply, InlineKeyboardMarkup, MessageId, ParseMode,
     ReplyKeyboardMarkup, ReplyKeyboardRemove, UpdateId, UserId,
@@ -10,7 +11,6 @@ use std::borrow::Cow;
 use std::default::Default;
 use std::error::Error;
 use std::fmt;
-use super::types::InputMedia;
 use std::net::IpAddr;
 
 /// Chat integer identifier or username
@@ -334,6 +334,115 @@ pub struct ForwardMessage<'a> {
     pub message_id: MessageId,
 }
 
+/// Use this method to copy messages of any kind. Service messages and invoice messages can't be
+/// copied. The method is analogous to the method `forwardMessage`, but the copied message doesn't
+/// have a link to the original message.
+///
+/// Returns the `MessageIdResult` of the sent message on success.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct CopyMessage<'a> {
+    /// Unique identifier for the target chat or username of the target channel
+    pub chat_id: ChatTarget<'a>,
+
+    /// Unique identifier for the chat where the original message was sent
+    pub from_chat_id: ChatTarget<'a>,
+
+    pub message_id: types::MessageId,
+
+    /// New caption for media, 0-1024 characters after entities parsing. If not specified, the
+    /// original caption is kept
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub caption: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parse_mode: Option<types::ParseMode>,
+
+    /// List of special entities that appear in the new caption, which can be specified instead
+    /// of `parse_mode`
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub caption_entities: Option<Vec<types::MessageEntity>>,
+
+    /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+    /// Users will receive a notification with no sound.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disable_notification: Option<bool>,
+
+    /// If the message is a reply, ID of the original message
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_to_message_id: Option<types::MessageId>,
+
+    /// Pass True, if the message should be sent even if the specified replied-to message is not found
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub allow_sending_without_reply: Option<bool>,
+
+    /// Additional interface options.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_markup: Option<ReplyMarkup>,
+}
+
+impl<'a> CopyMessage<'a> {
+    pub fn new(
+        chat_id: ChatTarget<'a>,
+        from_chat_id: ChatTarget<'a>,
+        message_id: types::MessageId,
+    ) -> Self {
+        Self {
+            chat_id,
+            from_chat_id,
+            message_id,
+            caption: None,
+            parse_mode: None,
+            disable_notification: None,
+            reply_to_message_id: None,
+            allow_sending_without_reply: None,
+            reply_markup: None,
+            caption_entities: None,
+        }
+    }
+
+    pub fn caption(self, caption: String) -> Self {
+        Self {
+            caption: Some(caption),
+            ..self
+        }
+    }
+
+    pub fn parse_mode(self, parse_mode: types::ParseMode) -> Self {
+        Self {
+            parse_mode: Some(parse_mode),
+            ..self
+        }
+    }
+
+    pub fn disable_notification(self, disable_notification: bool) -> Self {
+        Self {
+            disable_notification: Some(disable_notification),
+            ..self
+        }
+    }
+
+    pub fn reply_to_message_id(self, reply_to_message_id: types::MessageId) -> Self {
+        Self {
+            reply_to_message_id: Some(reply_to_message_id),
+            ..self
+        }
+    }
+
+    pub fn allow_sending_without_reply(self, allow_sending_without_reply: bool) -> Self {
+        Self {
+            allow_sending_without_reply: Some(allow_sending_without_reply),
+            ..self
+        }
+    }
+
+    pub fn reply_markup(self, reply_markup: ReplyMarkup) -> Self {
+        Self {
+            reply_markup: Some(reply_markup),
+            ..self
+        }
+    }
+}
+
 /// To get a list of profile pictures for a user. Returns a [`UserProfilePhotos`](types::UserProfilePhotos) object.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct GetUserProfilePhotos {
@@ -384,6 +493,107 @@ pub struct GetChatAdministrators<'a> {
 pub struct GetChatMember<'a> {
     pub chat_id: ChatTarget<'a>,
     pub user_id: UserId,
+}
+
+/// Use this method to send answers to callback queries sent from inline keyboards. The answer will
+/// be displayed to the user as a notification at the top of the chat screen or as an alert.
+///
+/// On success, True is returned.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct AnswerCallbackQuery {
+    /// Unique identifier for the query to be answered
+    pub callback_query_id: String,
+
+    /// Text of the notification. If not specified, nothing will be shown to the user,
+    /// 0-200 characters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
+
+    /// If true, an alert will be shown by the client instead of a notification at the top
+    /// of the chat screen. Defaults to false.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub show_alert: Option<bool>,
+
+    /// URL that will be opened by the user's client.
+    /// If you have created a `Game` and accepted the conditions via [@Botfather](https://t.me/botfather),
+    /// specify the URL that opens your game — note that this will only work if the query comes from a
+    /// `callback_game` button.
+    ///
+    /// Otherwise, you may use links like `t.me/your_bot?start=XXXX` that open your bot with a parameter.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+
+    /// The maximum amount of time in seconds that the result of the callback query may be
+    /// cached client-side. Telegram apps will support caching starting in version 3.14.
+    /// Defaults to 0.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cache_time: Option<u64>,
+}
+
+impl AnswerCallbackQuery {
+    pub fn new(callback_query_id: String) -> Self {
+        Self {
+            callback_query_id,
+            text: None,
+            show_alert: None,
+            url: None,
+            cache_time: None,
+        }
+    }
+
+    pub fn text(self, text: String) -> Self {
+        Self {
+            text: Some(text),
+            ..self
+        }
+    }
+
+    pub fn show_alert(self, show_alert: bool) -> Self {
+        Self {
+            show_alert: Some(show_alert),
+            ..self
+        }
+    }
+
+    pub fn url(self, url: String) -> Self {
+        Self {
+            url: Some(url),
+            ..self
+        }
+    }
+
+    pub fn cache_time(self, cache_time: u64) -> Self {
+        Self {
+            cache_time: Some(cache_time),
+            ..self
+        }
+    }
+}
+
+/// Use this method to send a group of photos, videos, documents or audios as an album. Documents
+/// and audio files can be only grouped in an album with messages of the same type.
+///
+/// On success, an array of `Messages` that were sent is returned.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct SendMediaGroup<'a> {
+    pub chat_id: ChatTarget<'a>,
+
+    /// must include 2-10 items
+    pub media: Vec<types::InputMedia>,
+    
+    /// Sends messages [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+    /// Users will receive a notification with no sound.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disable_notification: Option<bool>,
+
+    /// If the messages are a reply, ID of the original message
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reply_to_message_id: Option<types::MessageId>,
+
+    /// Pass True, if the message should be sent even if the specified replied-to message
+    /// is not found
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub allow_sending_without_reply: Option<bool>,
 }
 
 /// Use this method to edit text and game messages sent by the bot or via the bot (for inline bots).
@@ -516,7 +726,11 @@ pub struct EditMessageMedia<'a> {
 }
 
 impl<'a> EditMessageMedia<'a> {
-    pub fn new(chat_id: ChatTarget<'a>, message_id: MessageId, media: InputMedia) -> EditMessageMedia<'a> {
+    pub fn new(
+        chat_id: ChatTarget<'a>,
+        message_id: MessageId,
+        media: InputMedia,
+    ) -> EditMessageMedia<'a> {
         EditMessageMedia {
             chat_id: Some(chat_id),
             message_id: Some(message_id),
@@ -581,24 +795,29 @@ pub trait Method: Serialize {
 
 #[rustfmt::skip]
 impl_method_table!(
-//  [               MethodType,      method_url_segment,          ApiReturnType],
-    [                    GetMe,                 "getMe",            types::User],
-    [            DeleteWebhook,         "deleteWebhook",                   bool],
-    [           GetWebhookInfo,        "getWebhookInfo",     types::WebhookInfo],
-    [           GetUpdates<'_>,            "getUpdates",     Vec<types::Update>],
-    [           SetWebhook<'_>,            "setWebhook",                   bool],
-    [          SendMessage<'_>,           "sendMessage",         types::Message],
-    [       ForwardMessage<'_>,        "forwardMessage",         types::Message],
-    [      EditMessageText<'_>,       "editMessageText",         types::Message],
-    [        DeleteMessage<'_>,         "deleteMessage",                   bool],
-    [   EditMessageCaption<'_>,    "editMessageCaption",                   bool],
-    [          SendSticker<'_>,           "sendSticker",         types::Message],
-    [            SendPhoto<'_>,             "sendPhoto",         types::Message],
-    [         SendDocument<'_>,          "sendDocument",         types::Message],
-    [              GetChat<'_>,               "getChat",            types::Chat],
-    [GetChatAdministrators<'_>, "getChatAdministrators", Vec<types::ChatMember>],
-    [  GetChatMembersCount<'_>,   "getChatMembersCount",                    i32],
-    [        GetChatMember<'_>,         "getChatMember",      types::ChatMember]
+//  [                MethodType,       method_url_segment,          ApiReturnType],
+    [                     GetMe,                  "getMe",            types::User],
+    [             DeleteWebhook,          "deleteWebhook",                   bool],
+    [            GetWebhookInfo,         "getWebhookInfo",     types::WebhookInfo],
+    [            GetUpdates<'_>,             "getUpdates",     Vec<types::Update>],
+    [            SetWebhook<'_>,             "setWebhook",                   bool],
+    [           SendMessage<'_>,            "sendMessage",         types::Message],
+    [        ForwardMessage<'_>,         "forwardMessage",         types::Message],
+    [           CopyMessage<'_>,            "copyMessage", types::MessageIdResult],
+    [        SendMediaGroup<'_>,         "sendMediaGroup",    Vec<types::Message>],
+    [       EditMessageText<'_>,        "editMessageText",         types::Message],
+    [      EditMessageMedia<'_>,       "editMessageMedia",         types::Message],
+    [EditMessageReplyMarkup<'_>, "editMessageReplyMarkup",         types::Message],
+    [         DeleteMessage<'_>,          "deleteMessage",                   bool],
+    [    EditMessageCaption<'_>,     "editMessageCaption",                   bool],
+    [           SendSticker<'_>,            "sendSticker",         types::Message],
+    [             SendPhoto<'_>,              "sendPhoto",         types::Message],
+    [          SendDocument<'_>,           "sendDocument",         types::Message],
+    [               GetChat<'_>,                "getChat",            types::Chat],
+    [ GetChatAdministrators<'_>,  "getChatAdministrators", Vec<types::ChatMember>],
+    [   GetChatMembersCount<'_>,    "getChatMembersCount",                    i32],
+    [         GetChatMember<'_>,          "getChatMember",      types::ChatMember],
+    [       AnswerCallbackQuery,    "answerCallbackQuery",                   bool]
 );
 
 // https://core.telegram.org/bots/api#making-requests

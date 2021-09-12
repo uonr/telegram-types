@@ -58,12 +58,18 @@ impl_id! {UpdateId : i64}
 
 /// Unique identifier for a file
 /// # Sending by file_id
-/// * It is not possible to change the file type when resending by **file_id**. I.e. a [video](Video) can't be sent as a photo, a [photo](Photo) can't be sent as a document, etc.
+/// * It is not possible to change the file type when resending by **file_id**. I.e. a [video](Video) can't be sent as a photo, a [photo](PhotoSize) can't be sent as a document, etc.
 /// * It is not possible to resend thumbnails.
 /// * Resending a photo by **file_id** will send all of its [sizes](PhotoSize).
 /// * **file_id** is unique for each individual bot and can't be transferred from one bot to another.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct FileId(pub String);
+
+/// This object represents a unique message identifier.
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct MessageIdResult {
+    pub message_id: MessageId,
+}
 
 /// The UNIX timestamp
 #[cfg(not(feature = "high"))]
@@ -153,20 +159,15 @@ impl Default for UpdateContent {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct ShippingQuery {
-}
+pub struct ShippingQuery {}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct PreCheckoutQuery {
-}
+pub struct PreCheckoutQuery {}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct Poll {
-}
+pub struct Poll {}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct PollAnswer {
-}
+pub struct PollAnswer {}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct ChatMemberUpdated {
-}
+pub struct ChatMemberUpdated {}
 
 /// Contains information about the current status of a webhook.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -278,6 +279,11 @@ pub struct Message {
     pub message_id: MessageId,
     /// Sender, empty for messages sent to channels
     pub from: Option<Box<User>>,
+    /// Sender of the message, sent on behalf of a chat.
+    /// The channel itself for channel messages.
+    /// The supergroup itself for messages from anonymous group administrators.
+    /// The linked channel for messages automatically forwarded to the discussion group
+    pub sender_chat: Option<Chat>,
     /// Date the message was sent in Unix time
     pub date: Time,
     /// Conversation the message belongs to
@@ -957,15 +963,21 @@ pub enum InputMedia {
         /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
         media: FileToSend,
         /// *Optional*. Caption of the photo to be sent, 0-200 characters
+        #[serde(skip_serializing_if = "Option::is_none")]
         caption: Option<String>,
         /// *Optional*. Send Markdown or HTML, if you want Telegram apps to show
         /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options)
         /// in the media caption.
+        #[serde(skip_serializing_if = "Option::is_none")]
         parse_mode: Option<ParseMode>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         width: Option<i32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         height: Option<i32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         duration: Option<i32>,
         /// Pass True, if the uploaded video is suitable for streaming
+        #[serde(skip_serializing_if = "Option::is_none")]
         supports_streaming: Option<bool>,
     },
     #[serde(rename = "photo")]
@@ -980,10 +992,12 @@ pub enum InputMedia {
         /// [More info on Sending Files](https://core.telegram.org/bots/api#sending-files)
         media: FileToSend,
         /// *Optional*. Caption of the photo to be sent, 0-200 characters
+        #[serde(skip_serializing_if = "Option::is_none")]
         caption: Option<String>,
         /// *Optional*. Send Markdown or HTML, if you want Telegram apps to show
         /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options)
         /// in the media caption.
+        #[serde(skip_serializing_if = "Option::is_none")]
         parse_mode: Option<ParseMode>,
     },
     #[serde(rename = "animation")]
@@ -1008,28 +1022,43 @@ pub enum InputMedia {
         /// Thumbnails can’t be reused and can be only uploaded as a new file,
         /// so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded
         /// using multipart/form-data under <file_attach_name>.
+        #[serde(skip_serializing_if = "Option::is_none")]
         thumb: Option<InputFile>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         caption: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         parse_mode: Option<ParseMode>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         width: Option<i32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         height: Option<i32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         duration: Option<i32>,
     },
     #[serde(rename = "audio")]
     Audio {
         media: FileToSend,
+        #[serde(skip_serializing_if = "Option::is_none")]
         thumb: Option<InputFile>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         caption: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         parse_mode: Option<ParseMode>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         duration: Option<i32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         performer: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         title: Option<String>,
     },
     #[serde(rename = "document")]
     Document {
         media: FileToSend,
+        #[serde(skip_serializing_if = "Option::is_none")]
         thumb: Option<InputFile>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         caption: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         parse_mode: Option<ParseMode>,
     },
     #[serde(other)]

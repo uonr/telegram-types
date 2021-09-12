@@ -94,10 +94,9 @@ fn unknown() {
     assert_eq!(chat_type, ChatType::Unknown);
 }
 
-
 #[test]
 fn file_id() {
-    use serde_json::{to_string, from_str};
+    use serde_json::{from_str, to_string};
     use telegram_types::bot::types::FileToSend;
     let file_id = types::FileId("42".to_string());
     let file_to_send = FileToSend::FileId(file_id);
@@ -109,7 +108,7 @@ fn file_id() {
 
 #[test]
 fn input_file() {
-    use serde_json::{to_string};
+    use serde_json::to_string;
     use telegram_types::bot::types::{FileToSend, InputFile};
     let input_file = InputFile::new("cocona.webp");
     let input_file = FileToSend::InputFile(input_file);
