@@ -58,7 +58,7 @@ impl_id! {UpdateId : i64}
 
 /// Unique identifier for a file
 /// # Sending by file_id
-/// * It is not possible to change the file type when resending by **file_id**. I.e. a [video](Video) can't be sent as a photo, a [photo](Photo) can't be sent as a document, etc.
+/// * It is not possible to change the file type when resending by **file_id**. I.e. a [video](Video) can't be sent as a photo, a [photo](PhotoSize) can't be sent as a document, etc.
 /// * It is not possible to resend thumbnails.
 /// * Resending a photo by **file_id** will send all of its [sizes](PhotoSize).
 /// * **file_id** is unique for each individual bot and can't be transferred from one bot to another.

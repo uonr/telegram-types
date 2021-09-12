@@ -341,19 +341,41 @@ pub struct ForwardMessage<'a> {
 /// Returns the `MessageIdResult` of the sent message on success.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct CopyMessage<'a> {
+    /// Unique identifier for the target chat or username of the target channel
     pub chat_id: ChatTarget<'a>,
+
+    /// Unique identifier for the chat where the original message was sent
     pub from_chat_id: ChatTarget<'a>,
+
     pub message_id: types::MessageId,
+
+    /// New caption for media, 0-1024 characters after entities parsing. If not specified, the
+    /// original caption is kept
     #[serde(skip_serializing_if = "Option::is_none")]
     pub caption: Option<String>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parse_mode: Option<types::ParseMode>,
+
+    /// List of special entities that appear in the new caption, which can be specified instead
+    /// of `parse_mode`
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub caption_entities: Option<Vec<types::MessageEntity>>,
+
+    /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+    /// Users will receive a notification with no sound.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_notification: Option<bool>,
+
+    /// If the message is a reply, ID of the original message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_to_message_id: Option<types::MessageId>,
+
+    /// Pass True, if the message should be sent even if the specified replied-to message is not found
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_sending_without_reply: Option<bool>,
+
+    /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_markup: Option<ReplyMarkup>,
 }
@@ -374,6 +396,7 @@ impl<'a> CopyMessage<'a> {
             reply_to_message_id: None,
             allow_sending_without_reply: None,
             reply_markup: None,
+            caption_entities: None,
         }
     }
 
@@ -478,15 +501,33 @@ pub struct GetChatMember<'a> {
 /// On success, True is returned.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct AnswerCallbackQuery {
-    callback_query_id: String,
+    /// Unique identifier for the query to be answered
+    pub callback_query_id: String,
+
+    /// Text of the notification. If not specified, nothing will be shown to the user,
+    /// 0-200 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    text: Option<String>,
+    pub text: Option<String>,
+
+    /// If true, an alert will be shown by the client instead of a notification at the top
+    /// of the chat screen. Defaults to false.
     #[serde(skip_serializing_if = "Option::is_none")]
-    show_alert: Option<bool>,
+    pub show_alert: Option<bool>,
+
+    /// URL that will be opened by the user's client.
+    /// If you have created a `Game` and accepted the conditions via [@Botfather](https://t.me/botfather),
+    /// specify the URL that opens your game — note that this will only work if the query comes from a
+    /// `callback_game` button.
+    ///
+    /// Otherwise, you may use links like `t.me/your_bot?start=XXXX` that open your bot with a parameter.
     #[serde(skip_serializing_if = "Option::is_none")]
-    url: Option<String>,
+    pub url: Option<String>,
+
+    /// The maximum amount of time in seconds that the result of the callback query may be
+    /// cached client-side. Telegram apps will support caching starting in version 3.14.
+    /// Defaults to 0.
     #[serde(skip_serializing_if = "Option::is_none")]
-    cache_time: Option<u64>,
+    pub cache_time: Option<u64>,
 }
 
 impl AnswerCallbackQuery {
@@ -536,11 +577,21 @@ impl AnswerCallbackQuery {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct SendMediaGroup<'a> {
     pub chat_id: ChatTarget<'a>,
+
+    /// must include 2-10 items
     pub media: Vec<types::InputMedia>,
+    
+    /// Sends messages [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+    /// Users will receive a notification with no sound.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_notification: Option<bool>,
+
+    /// If the messages are a reply, ID of the original message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reply_to_message_id: Option<types::MessageId>,
+
+    /// Pass True, if the message should be sent even if the specified replied-to message
+    /// is not found
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_sending_without_reply: Option<bool>,
 }
