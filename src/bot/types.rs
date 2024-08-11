@@ -146,6 +146,8 @@ pub enum UpdateContent {
     #[doc(hidden)]
     PollAnswer(PollAnswer),
     #[doc(hidden)]
+    ChatJoinRequest(ChatJoinRequest),
+    #[doc(hidden)]
     MyChatMember(ChatMemberUpdated),
     #[doc(hidden)]
     ChatMember(ChatMemberUpdated),
@@ -167,7 +169,15 @@ pub struct Poll {}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct PollAnswer {}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct ChatMemberUpdated {}
+pub struct ChatMemberUpdated {
+    pub chat_join_request: ChatJoinRequest,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct ChatJoinRequest {
+    pub chat: Chat,
+    pub from: User,
+}
 
 /// Contains information about the current status of a webhook.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]

@@ -580,7 +580,7 @@ pub struct SendMediaGroup<'a> {
 
     /// must include 2-10 items
     pub media: Vec<types::InputMedia>,
-    
+
     /// Sends messages [silently](https://telegram.org/blog/channels-2-0#silent-messages).
     /// Users will receive a notification with no sound.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -771,6 +771,18 @@ pub struct DeleteMessage<'a> {
     pub message_id: MessageId,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct ApproveJoinRequest<'a> {
+    pub chat_id: ChatTarget<'a>,
+    pub user_id: UserId,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct DeclineJoinRequest<'a> {
+    pub chat_id: ChatTarget<'a>,
+    pub user_id: UserId,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetMe;
 
@@ -817,7 +829,9 @@ impl_method_table!(
     [ GetChatAdministrators<'_>,  "getChatAdministrators", Vec<types::ChatMember>],
     [   GetChatMembersCount<'_>,    "getChatMembersCount",                    i32],
     [         GetChatMember<'_>,          "getChatMember",      types::ChatMember],
-    [       AnswerCallbackQuery,    "answerCallbackQuery",                   bool]
+    [       AnswerCallbackQuery,    "answerCallbackQuery",                   bool],
+    [    ApproveJoinRequest<'_>, "approveChatJoinRequest",                   bool],
+    [    DeclineJoinRequest<'_>, "declineChatJoinRequest",                   bool]
 );
 
 // https://core.telegram.org/bots/api#making-requests
