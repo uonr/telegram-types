@@ -136,6 +136,16 @@ pub enum UpdateContent {
     ChosenInlineResult(ChosenInlineResult),
     /// New incoming callback query
     CallbackQuery(CallbackQuery),
+    /// The bot's chat member status was updated in a chat.
+    /// For private chats, this update is received only when the bot is blocked or unblocked by the user.
+    MyChatMember(ChatMemberUpdated),
+    /// A chat member's status was updated in a chat.
+    /// The bot must be an administrator in the chat and must explicitly
+    /// specify `"chat_member"` in the list of allowed_updates to receive these updates.
+    ChatMember(ChatMemberUpdated),
+    /// A request to join the chat has been sent.
+    /// The bot must have the `can_invite_users` administrator right in the chat to receive these updates.
+    ChatJoinRequest(ChatJoinRequest),
     // TODO: implement these placeholders
     #[doc(hidden)]
     ShippingQuery(ShippingQuery),
@@ -145,12 +155,6 @@ pub enum UpdateContent {
     Poll(Poll),
     #[doc(hidden)]
     PollAnswer(PollAnswer),
-    #[doc(hidden)]
-    ChatJoinRequest(ChatJoinRequest),
-    #[doc(hidden)]
-    MyChatMember(ChatMemberUpdated),
-    #[doc(hidden)]
-    ChatMember(ChatMemberUpdated),
     /// Unknown update type
     Unknown,
 }
@@ -168,15 +172,60 @@ pub struct PreCheckoutQuery {}
 pub struct Poll {}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct PollAnswer {}
+
+/// This object represents changes in the status of a chat member.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct ChatMemberUpdated {
-    pub chat_join_request: ChatJoinRequest,
+    pub chat: Chat,
+    pub from: User,
+    pub date: Time,
+    /// Previous information about the chat member
+    pub old_chat_member: ChatMember,
+    /// New information about the chat member
+    pub new_chat_member: ChatMember,
+    /// Chat invite link, which was used by the user to join the chat;
+    /// for joining by invite link events only.
+    pub invite_link: Option<ChatInviteLink>,
+    /// True, if the user joined the chat after sending a direct join request
+    /// without using an invite link and being approved by an administrator
+    pub via_join_request: Option<bool>,
+    /// True, if the user joined the chat via a chat folder invite link
+    pub via_chat_folder_invite_link: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct ChatJoinRequest {
     pub chat: Chat,
     pub from: User,
+    pub user_chat_id: UserId,
+    pub date: Time,
+    /// Bio of the user.
+    pub bio: Option<String>,
+    /// Chat invite link that was used by the user to send the join request
+    pub invite_link: Option<ChatInviteLink>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct ChatInviteLink {
+    /// The invite link.
+    /// 
+    /// If the link was created by another chat administrator, then the second part of the link will be replaced with “…”.
+    invite_link: String,
+    /// Creator of the link
+    creator: User,
+    /// `True``, if users joining the chat via the link need to be approved by chat administrators
+    creates_join_request: bool,
+    is_primary: bool,
+    is_revoked: bool,
+    /// Invite link name
+    name: Option<String>,
+    /// Point in time (Unix timestamp) when the link will expire or has been expired
+    expire_date: Option<Time>,
+    /// The maximum number of users that can be members of the chat simultaneously
+    /// after joining the chat via this invite link; 1-99999
+    member_limit: Option<i32>,
+    /// Number of pending join requests created using this link
+    pending_join_request_count: Option<i32>,
 }
 
 /// Contains information about the current status of a webhook.
