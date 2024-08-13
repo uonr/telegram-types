@@ -1,15 +1,13 @@
 [package]
 name = "telegram_types"
-version = "0.6.0"
-authors = ["Quan Brew <t@ioover.net>"]
-repository = "https://github.com/quanbrew/telegram-types"
+version = "0.7.0"
+authors = ["uonr <dev@yuru.me>"]
+repository = "https://github.com/uonr/telegram-types"
 categories = ["api-bindings"]
 license = "MIT"
 description = "Types in the Telegram Bot API and their deserializers"
 readme = "README.md"
 edition = "2018"
-[badges]
-travis-ci = { repository = "quanbrew/telegram-types", branch = "master" }
 
 [features]
 high = ["chrono"]
