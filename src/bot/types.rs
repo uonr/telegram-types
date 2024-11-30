@@ -208,7 +208,7 @@ pub struct ChatJoinRequest {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct ChatInviteLink {
     /// The invite link.
-    /// 
+    ///
     /// If the link was created by another chat administrator, then the second part of the link will be replaced with “…”.
     invite_link: String,
     /// Creator of the link
@@ -266,6 +266,22 @@ pub struct User {
     pub username: Option<String>,
     /// [IETF language tag](https://en.wikipedia.org/wiki/IETF_language_tag) of the user's language
     pub language_code: Option<String>,
+    #[serde(default = "falsum")]
+    pub is_premium: bool,
+    /// Optional. True, if this user added the bot to the attachment menu
+    #[serde(default = "falsum")]
+    pub added_to_attachment_menu: bool,
+    /// Optional. True, if the bot can be invited to groups. Returned only in getMe.
+    pub can_join_groups: Option<bool>,
+    /// Optional. True, if privacy mode is disabled for the bot. Returned only in getMe.
+    pub can_read_all_group_messages: Option<bool>,
+    /// Optional. True, if the bot supports inline queries. Returned only in getMe.
+    pub supports_inline_queries: Option<bool>,
+    /// Optional. True, if the bot can be connected to a Telegram Business account to receive its messages.
+    /// Returned only in getMe.
+    pub can_connect_to_business: Option<bool>,
+    /// Optional. True, if the bot has a main Web App. Returned only in getMe.
+    pub has_main_web_app: Option<bool>,
 }
 
 /// Type of chat
